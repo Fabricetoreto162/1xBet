@@ -1,0 +1,7 @@
+{
+  "name": "1xBet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
