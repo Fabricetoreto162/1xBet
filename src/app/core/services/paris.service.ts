@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import {
-  collection, getDocs, getDoc, addDoc, doc, orderBy, query, onSnapshot, updateDoc, deleteDoc
+  collection, getDocs, getDoc, addDoc, doc, orderBy, query, onSnapshot, updateDoc, deleteDoc, where
 } from 'firebase/firestore';
 import { db } from '../../data/firebase/firebase-client';
 import { Pari, JambePari } from '../models/pari.model';
 import { Evenement } from '../models/evenement.model';
 import { SoldeService } from './solde.service';
 import { EvenementsService } from './evenements.service';
+import { ProfilService } from './profil.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 function genererNumeroCoupon(): string {
-  // Nombre à 11 chiffres, dans le même esprit que les tickets 1xBet (ex. 76854180949)
   return Math.floor(10_000_000_000 + Math.random() * 90_000_000_000).toString();
 }
 
@@ -24,7 +24,8 @@ export class ParisService {
 
   constructor(
     private soldeSvc: SoldeService,
-    private evenementsSvc: EvenementsService
+    private evenementsSvc: EvenementsService,
+    private profilSvc: ProfilService
   ) {
     this.initEcoute();
   }
@@ -35,9 +36,12 @@ export class ParisService {
 
   private initEcoute(): void {
     if (this.ecouteActive) return;
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) return;
+
     this.ecouteActive = true;
     try {
-      const q = query(this.ref, orderBy('dateCreation', 'desc'));
+      const q = query(this.ref, where('userId', '==', userId), orderBy('dateCreation', 'desc'));
       onSnapshot(q, (snap) => {
         const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Pari));
         this.parisCache = list;
@@ -49,10 +53,13 @@ export class ParisService {
   }
 
   async listerTous(forceRefresh = false): Promise<Pari[]> {
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) return [];
+
     if (this.parisCache !== null && !forceRefresh) {
       return this.parisCache;
     }
-    const q = query(this.ref, orderBy('dateCreation', 'desc'));
+    const q = query(this.ref, where('userId', '==', userId), orderBy('dateCreation', 'desc'));
     const snap = await getDocs(q);
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Pari));
     this.parisCache = list;
@@ -69,12 +76,12 @@ export class ParisService {
     return snap.exists() ? ({ id: snap.id, ...snap.data() } as Pari) : null;
   }
 
-  /**
-   * Compose un coupon à partir d'événements sélectionnés, débite le
-   * solde de la mise, et génère automatiquement le numéro de coupon
-   * (affiché ensuite dans l'historique et le détail du pari).
-   */
-  async creerEtPlacer(evenementIds: string[], mise: number): Promise<Pari> {
+   async creerEtPlacer(evenementIds: string[], mise: number): Promise<Pari> {
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) {
+      throw new Error('UTILISATEUR_NON_CONNECTE');
+    }
+
     const soldeActuel = await this.soldeSvc.getMontant();
     if (mise > soldeActuel) {
       throw new Error('SOLDE_INSUFFISANT');
@@ -105,40 +112,31 @@ export class ParisService {
       paye: false,
       gains: 0,
       evenementIds,
-      jambes
+      jambes,
+      userId: userId // <-- Plus d'erreur car on a vérifié le null au-dessus
     };
 
-    // 1. On enregistre dans Firebase. L'écouteur (onSnapshot) va 
-    // détecter l'ajout et mettre à jour l'historique tout seul !
     const docRef = await addDoc(this.ref, nouveauPari);
     const pariCree: Pari = { id: docRef.id, ...nouveauPari };
 
-    // (On a retiré la mise à jour manuelle de parisCache ici pour éviter le doublon)
-
-    // 2. On débite le solde du joueur
     await this.soldeSvc.debiter(mise);
 
     return pariCree;
   }
 
-  // NOUVELLE MÉTHODE : Met à jour un pari dans Firebase
   async modifier(id: string, modifications: Partial<Pari>): Promise<void> {
     const ref = doc(db, 'paris', id);
     await updateDoc(ref, modifications);
   }
 
-  // NOUVELLE MÉTHODE : Supprime un pari
   async supprimer(id: string): Promise<void> {
     await deleteDoc(doc(db, 'paris', id));
   }
 
-  // NOUVELLE MÉTHODE : Vérifie et met à jour le statut des paris (Gagné/Perdu) en fonction des scores
   async evaluerEtMettreAJourParis(eventsMap: Map<string, Evenement>): Promise<void> {
-    // On récupère tous les paris existants
-    const paris = await this.listerTous(true); // forceRefresh = true
+    const paris = await this.listerTous(true);
     
     for (const pari of paris) {
-      // On ne vérifie que les paris qui sont encore "accepte"
       if (pari.statut !== 'accepte') continue;
 
       let toutesJambesGagnees = true;
@@ -147,17 +145,14 @@ export class ParisService {
       const jambesMisesAJour = pari.jambes.map(jambe => {
         const event = eventsMap.get(jambe.evenementId);
         
-        // Si l'événement n'est pas encore terminé, la jambe reste en attente
         if (!event || event.statutEvenement !== 'termine' || !event.scoreFinal) {
           toutesJambesGagnees = false;
           return jambe;
         }
 
         const scoreTotal = event.scoreFinal.a + event.scoreFinal.b;
-          // ON FORCE LE TYPE ICI pour que TypeScript accepte
         let statutJambe: 'gagne' | 'perdu' | 'en_attente' = 'perdu'; 
 
-        // Vérification du pronostic (Plus de / Moins de)
         if (jambe.sens === 'plus' && scoreTotal > jambe.seuilTotal) {
           statutJambe = 'gagne';
         } else if (jambe.sens === 'moins' && scoreTotal < jambe.seuilTotal) {
@@ -172,16 +167,13 @@ export class ParisService {
         return { ...jambe, statutJambe };
       });
 
-      // Si on a perdu une jambe, le pari est perdu
       if (uneJambePerdue) {
         await this.modifier(pari.id!, {
           statut: 'perdu',
           gains: 0,
           jambes: jambesMisesAJour
         });
-      } 
-      // Si toutes les jambes sont gagnées, le pari est gagné
-      else if (toutesJambesGagnees) {
+      } else if (toutesJambesGagnees) {
         const gains = Math.round(pari.mise * pari.coteCombinee);
         await this.modifier(pari.id!, {
           statut: 'gagne',
@@ -189,7 +181,6 @@ export class ParisService {
           jambes: jambesMisesAJour
         });
       }
-      // Sinon, le pari est toujours "accepte" (en attente des autres matchs)
     }
   }
 }

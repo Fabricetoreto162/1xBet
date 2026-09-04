@@ -1,0 +1,94 @@
+.setup-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* En-tête */
+.header-section {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo-circle {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 20px;
+    background: var(--app-surface);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+    ion-icon {
+      font-size: 48px;
+      color: var(--app-primary);
+    }
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--app-text);
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--app-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+/* Carte du formulaire */
+.form-card {
+  background: var(--app-surface);
+  border-radius: 20px;
+  padding: 8px 16px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .custom-item {
+    --background: transparent;
+    --padding-start: 0;
+    margin-bottom: 8px;
+
+    /* Style de l'input */
+    ion-input {
+      --color: var(--app-text);
+      --placeholder-color: var(--app-text-secondary);
+      --placeholder-opacity: 0.6;
+      
+      /* Label au-dessus */
+      --label-color: var(--app-text-secondary);
+      --label-font-weight: 600;
+      font-size: 15px;
+      
+      /* Ligne du bas */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+  }
+
+  .submit-btn {
+    margin-top: 24px;
+    --background: var(--app-primary);
+    --color: #ffffff;
+    font-weight: 700;
+    height: 52px;
+    --border-radius: 12px;
+    text-transform: none;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}

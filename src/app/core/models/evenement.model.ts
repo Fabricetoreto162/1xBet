@@ -1,5 +1,6 @@
 export interface Evenement {
   id?: string;
+  userId?: string; // <-- AJOUTÉ
   equipeADomicileId: string;
   equipeExterieurId: string;
   championnatId: string;

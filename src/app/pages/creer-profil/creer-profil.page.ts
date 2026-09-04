@@ -25,6 +25,7 @@ export class CreerProfilPage implements OnInit {
   prenom = '';
   nom = '';
   enregistrement = false;
+  profilExiste = false;
 
   constructor(
     private profilSvc: ProfilService,
@@ -44,13 +45,16 @@ export class CreerProfilPage implements OnInit {
     await this.chargerProfil();
   }
 
-  profilExiste = false;
-
   private async chargerProfil() {
     try {
       const p = await this.profilSvc.getProfil();
-      this.prenom = p.prenom || '';
-      this.nom = p.nom || '';
+      if (p) { // <-- Sécurité : on vérifie que p n'est pas null
+        this.prenom = p.prenom || '';
+        this.nom = p.nom || '';
+      } else {
+        this.prenom = '';
+        this.nom = '';
+      }
       this.profilExiste = !!(this.prenom.trim() || this.nom.trim());
     } catch (e) {
       console.error('Erreur chargement profil', e);
@@ -91,7 +95,8 @@ export class CreerProfilPage implements OnInit {
     await loading.present();
 
     try {
-      await this.profilSvc.enregistrerProfil({
+      // On utilise la nouvelle méthode sauvegarderProfil
+      await this.profilSvc.sauvegarderProfil({
         prenom: this.prenom,
         nom: this.nom
       });

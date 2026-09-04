@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./favoris.page.scss']
 })
 export class FavorisPage implements OnInit, OnDestroy {
-  profil: Profil = { prenom: '', nom: '' };
+  profil: Profil | null = null; // <-- Autorise le null
   private sub = new Subscription();
 
   constructor(
@@ -26,19 +26,22 @@ export class FavorisPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.sub.add(
-      this.profilSvc.ecouterProfil().subscribe((p: Profil) => {
+      this.profilSvc.ecouterProfil().subscribe((p: Profil | null) => { // <-- Ajout de | null
         if (p) {
           this.profil = p;
           this.cdr.detectChanges();
         }
       })
     );
-    this.profil = await this.profilSvc.getProfil();
+    
+    const profilRecupere = await this.profilSvc.getProfil();
+    this.profil = profilRecupere ? profilRecupere : { prenom: '', nom: '' }; // <-- Gestion du null
     this.cdr.detectChanges();
   }
 
   async ionViewWillEnter() {
-    this.profil = await this.profilSvc.getProfil();
+    const profilRecupere = await this.profilSvc.getProfil();
+    this.profil = profilRecupere ? profilRecupere : { prenom: '', nom: '' }; // <-- Gestion du null
     this.cdr.detectChanges();
   }
 
@@ -47,6 +50,7 @@ export class FavorisPage implements OnInit, OnDestroy {
   }
 
   get profilExiste(): boolean {
+    if (!this.profil) return false; // <-- Sécurité
     return !!((this.profil.prenom && this.profil.prenom.trim()) || (this.profil.nom && this.profil.nom.trim()));
   }
 
@@ -55,7 +59,7 @@ export class FavorisPage implements OnInit, OnDestroy {
   }
 
   get sousTitreBoutonProfil(): string {
-    if (this.profilExiste) {
+    if (this.profilExiste && this.profil) {
       const complet = `${this.profil.prenom} ${this.profil.nom}`.trim();
       return `Modifier vos informations (${complet})`;
     }
@@ -73,4 +77,4 @@ export class FavorisPage implements OnInit, OnDestroy {
   saisirScores() { 
     this.router.navigateByUrl('/scores'); 
   }
-}
+}

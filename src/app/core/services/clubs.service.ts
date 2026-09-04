@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { 
   collection, onSnapshot, query, orderBy, addDoc, doc, updateDoc, deleteDoc,
-  getDocs, getDoc
+  getDocs, getDoc, where
 } from 'firebase/firestore';
 import { db } from '../../data/firebase/firebase-client';
 import { Club } from '../models/club.model';
+import { ProfilService } from './profil.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -15,15 +16,18 @@ export class ClubsService {
   public clubs$: Observable<Club[]> = this.clubsSubject.asObservable();
   private ecouteActive = false;
 
-  constructor() {
+  constructor(private profilSvc: ProfilService) {
     this.initEcoute();
   }
 
   private initEcoute(): void {
     if (this.ecouteActive) return;
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) return;
+
     this.ecouteActive = true;
     try {
-      const q = query(this.ref, orderBy('nom'));
+      const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
       onSnapshot(q, (snap) => {
         const clubs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Club));
         this.clubsCache = clubs;
@@ -35,10 +39,13 @@ export class ClubsService {
   }
 
   async listerTous(forceRefresh = false): Promise<Club[]> {
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) return [];
+
     if (this.clubsCache !== null && !forceRefresh) {
       return this.clubsCache;
     }
-    const q = query(this.ref, orderBy('nom'));
+    const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
     const snap = await getDocs(q);
     const clubs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Club));
     this.clubsCache = clubs;
@@ -59,13 +66,18 @@ export class ClubsService {
     return snap.exists() ? ({ id: snap.id, ...snap.data() } as Club) : null;
   }
 
-  async ajouter(club: Club): Promise<string> {
-    const docRef = await addDoc(this.ref, club);
-    const nouveau = { ...club, id: docRef.id };
-    if (this.clubsCache) {
-      this.clubsCache = [...this.clubsCache, nouveau].sort((a, b) => a.nom.localeCompare(b.nom));
-      this.clubsSubject.next(this.clubsCache);
-    }
+   async ajouter(club: Club): Promise<string> {
+    const userId = this.profilSvc.currentUserId;
+    if (!userId) return '';
+
+    const clubAvecUserId = { ...club, userId: userId };
+    const docRef = await addDoc(this.ref, clubAvecUserId);
+    const nouveau = { ...clubAvecUserId, id: docRef.id };
+    
+    // On utilise || [] pour éviter l'erreur si le cache est null
+    this.clubsCache = [...(this.clubsCache || []), nouveau].sort((a, b) => a.nom.localeCompare(b.nom));
+    this.clubsSubject.next(this.clubsCache);
+    
     return docRef.id;
   }
 
@@ -90,4 +102,4 @@ export class ClubsService {
       this.clubsSubject.next(this.clubsCache);
     }
   }
-}
+}

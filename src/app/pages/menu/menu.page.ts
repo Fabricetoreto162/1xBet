@@ -16,7 +16,7 @@ import { Subscription } from 'rxjs';
 })
 export class MenuPage implements OnInit, OnDestroy {
   solde = 0;
-  profil: Profil = { prenom: '', nom: '' };
+  profil: Profil | null = null; // <-- Autorise le null
   ongletActif: 'populaires' | 'sports' | 'casino' | '1xgames' | 'autre' = 'populaires';
   private subs = new Subscription();
   chargementEnCours = true;
@@ -39,7 +39,7 @@ export class MenuPage implements OnInit, OnDestroy {
     );
 
     this.subs.add(
-      this.profilSvc.ecouterProfil().subscribe((p: Profil) => {
+      this.profilSvc.ecouterProfil().subscribe((p: Profil | null) => { // <-- Ajout de | null
         if (p) {
           this.profil = p;
           this.cdr.detectChanges();
@@ -47,18 +47,18 @@ export class MenuPage implements OnInit, OnDestroy {
       })
     );
 
-    [this.solde, this.profil] = await Promise.all([
-      this.soldeSvc.getMontant(),
-      this.profilSvc.getProfil()
-    ]);
+    const profilRecupere = await this.profilSvc.getProfil();
+    this.profil = profilRecupere ? profilRecupere : { prenom: '', nom: '' };
+    this.solde = await this.soldeSvc.getMontant();
+    
     this.cdr.detectChanges();
   }
 
   async ionViewWillEnter() {
-    [this.solde, this.profil] = await Promise.all([
-      this.soldeSvc.getMontant(),
-      this.profilSvc.getProfil()
-    ]);
+    const profilRecupere = await this.profilSvc.getProfil();
+    this.profil = profilRecupere ? profilRecupere : { prenom: '', nom: '' };
+    this.solde = await this.soldeSvc.getMontant();
+    
     this.cdr.detectChanges();
   }
 
@@ -94,6 +94,9 @@ export class MenuPage implements OnInit, OnDestroy {
   }
 
   get nomComplet(): string {
+    // Sécurité si le profil est null
+    if (!this.profil) return 'Mon Profil';
+    
     const p = (this.profil.prenom || '').trim();
     const n = (this.profil.nom || '').trim();
     if (p || n) {

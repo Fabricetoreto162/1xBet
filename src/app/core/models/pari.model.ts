@@ -8,8 +8,9 @@ export interface JambePari {
 
 export interface Pari {
   id?: string;
-  numero: string; // numéro de coupon généré automatiquement à la mise
-  dateCreation: string; // ISO
+  userId?: string; // <-- AJOUTÉ
+  numero: string; 
+  dateCreation: string; 
   mise: number;
   coteCombinee: number;
   statut: 'accepte' | 'gagne' | 'perdu';

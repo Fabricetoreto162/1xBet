@@ -1,0 +1,45 @@
+<ion-content [fullscreen]="true">
+  <div class="setup-container">
+    
+    <!-- En-tête de bienvenue -->
+    <div class="header-section">
+      <div class="logo-circle">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </div>
+      <h1>Bienvenue</h1>
+      <p>Créez votre profil pour commencer à parier</p>
+    </div>
+
+    <!-- Carte du formulaire -->
+    <div class="form-card">
+      
+      <ion-item lines="none" class="custom-item">
+        <ion-input 
+          label="Prénom" 
+          labelPlacement="stacked" 
+          [(ngModel)]="profil.prenom"
+          placeholder="Ex. Alex">
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-item">
+        <ion-input 
+          label="Nom" 
+          labelPlacement="stacked" 
+          [(ngModel)]="profil.nom"
+          placeholder="Ex. TORETO">
+        </ion-input>
+      </ion-item>
+
+      <ion-button 
+        expand="block" 
+        class="submit-btn" 
+        [disabled]="!profil.nom || !profil.prenom" 
+        (click)="valider()">
+        Commencer
+      </ion-button>
+
+    </div>
+
+  </div>
+</ion-content>
