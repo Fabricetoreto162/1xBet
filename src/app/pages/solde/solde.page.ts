@@ -6,7 +6,7 @@ import {
   IonSegment, IonSegmentButton, IonLabel, LoadingController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { trendingUpOutline, trendingDownOutline, checkmarkOutline } from 'ionicons/icons';
+import { trendingUpOutline, trendingDownOutline, checkmarkOutline, walletOutline } from 'ionicons/icons';
 import { SoldeService } from '../../core/services/solde.service';
 import { Subscription } from 'rxjs';
 
@@ -32,7 +32,7 @@ export class SoldePage implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private loadingCtrl: LoadingController
   ) {
-    addIcons({ trendingUpOutline, trendingDownOutline, checkmarkOutline });
+    addIcons({ trendingUpOutline, trendingDownOutline, checkmarkOutline, walletOutline });
   }
 
   async ngOnInit() {
@@ -69,7 +69,6 @@ export class SoldePage implements OnInit, OnDestroy {
       if (this.mode === 'crediter') {
         await this.soldeSvc.crediter(this.montant);
       } else {
-        // Appel de la méthode modifier (débiter)
         await this.soldeSvc.debiter(this.montant);
       }
       this.solde = await this.soldeSvc.getMontant();

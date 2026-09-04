@@ -1,40 +1,154 @@
 <ion-content [fullscreen]="true">
   <div class="page-wrap">
     
+    <!-- En-tête personnalisé -->
     <div class="custom-header">
-      <ion-buttons>
-        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
-      </ion-buttons>
-      <h1>Saisir les scores</h1>
+      <div class="header-left">
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
+        </ion-buttons>
+        <div class="header-titles">
+          <h1>Saisir les scores</h1>
+          <span class="sub-counter" *ngIf="evenements.length > 0">
+            <span class="pulse-dot"></span>
+            {{ evenements.length }} match{{ evenements.length > 1 ? 's' : '' }} en attente de résultat
+          </span>
+          <span class="sub-counter termines" *ngIf="evenements.length === 0">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Tous les matchs sont clôturés
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="liste-scores">
       
+      <!-- Notice informative -->
+      <div class="info-banner" *ngIf="evenements.length > 0">
+        <div class="banner-icon">
+          <ion-icon name="information-circle-outline"></ion-icon>
+        </div>
+        <div class="banner-text">
+          <strong>Règlement automatique des paris</strong>
+          <p>Indiquez le score final au format <code>Domicile - Extérieur</code> (ex: <code>2-1</code>). L'évaluation des paris gagnés ou perdus est immédiate.</p>
+        </div>
+      </div>
+
+      <!-- Cartes de match à scorer -->
       <div class="event-card" *ngFor="let ev of evenements">
-        <div class="event-header">
-          <ion-badge color="medium">{{ ev.dateHeure }}</ion-badge>
-        </div>
         
-        <div class="event-body">
-          <span>{{ getNomClub(ev.equipeADomicileId) }}</span>
-          <span class="vs">vs</span>
-          <span>{{ getNomClub(ev.equipeExterieurId) }}</span>
+        <!-- En-tête du match -->
+        <div class="event-top-bar">
+          <div class="date-chip">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ ev.dateHeure | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
+
+          <div class="market-chip">
+            <span class="market-label">Pari :</span>
+            <strong class="market-val">{{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }} buts</strong>
+            <span class="market-odd" *ngIf="ev.cote">({{ ev.cote | number:'1.2-2' }})</span>
+          </div>
         </div>
 
-        <div class="score-input">
-          <ion-item>
-            <!-- Ajout du point d'exclamation sur ev.id! -->
-            <ion-input label="Score (ex: 2-1)" labelPlacement="stacked" [(ngModel)]="scores[ev.id!]"></ion-input>
-          </ion-item>
-          <ion-button (click)="enregistrerScore(ev)">
-            <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
+        <!-- Duel des équipes -->
+        <div class="duel-container">
+          
+          <!-- Équipe Domicile -->
+          <div class="team-block home">
+            <div class="team-avatar">
+              <img 
+                *ngIf="getLogoClub(ev.equipeADomicileId)" 
+                [src]="getLogoClub(ev.equipeADomicileId)" 
+                [alt]="getNomClub(ev.equipeADomicileId)" 
+                referrerpolicy="no-referrer" />
+              <span *ngIf="!getLogoClub(ev.equipeADomicileId)" class="avatar-initials">
+                {{ getInitiales(getNomClub(ev.equipeADomicileId)) }}
+              </span>
+            </div>
+            <span class="team-name">{{ getNomClub(ev.equipeADomicileId) }}</span>
+            <span class="home-tag">Domicile</span>
+          </div>
+
+          <!-- Séparateur VS -->
+          <div class="versus-wrap">
+            <div class="vs-circle">VS</div>
+            <div class="vs-bar"></div>
+          </div>
+
+          <!-- Équipe Extérieur -->
+          <div class="team-block away">
+            <div class="team-avatar">
+              <img 
+                *ngIf="getLogoClub(ev.equipeExterieurId)" 
+                [src]="getLogoClub(ev.equipeExterieurId)" 
+                [alt]="getNomClub(ev.equipeExterieurId)" 
+                referrerpolicy="no-referrer" />
+              <span *ngIf="!getLogoClub(ev.equipeExterieurId)" class="avatar-initials">
+                {{ getInitiales(getNomClub(ev.equipeExterieurId)) }}
+              </span>
+            </div>
+            <span class="team-name">{{ getNomClub(ev.equipeExterieurId) }}</span>
+            <span class="away-tag">Extérieur</span>
+          </div>
+
+        </div>
+
+        <!-- Raccourcis rapides de scores -->
+        <div class="quick-scores-row">
+          <span class="quick-title">Suggestions rapides :</span>
+          <div class="quick-chips-scroll">
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '1-0'" (click)="appliquerScore(ev.id!, '1-0')">1-0</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '2-0'" (click)="appliquerScore(ev.id!, '2-0')">2-0</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '2-1'" (click)="appliquerScore(ev.id!, '2-1')">2-1</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '1-1'" (click)="appliquerScore(ev.id!, '1-1')">1-1</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '0-0'" (click)="appliquerScore(ev.id!, '0-0')">0-0</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '0-1'" (click)="appliquerScore(ev.id!, '0-1')">0-1</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '1-2'" (click)="appliquerScore(ev.id!, '1-2')">1-2</button>
+            <button type="button" class="score-chip" [class.selected]="scores[ev.id!] === '3-1'" (click)="appliquerScore(ev.id!, '3-1')">3-1</button>
+          </div>
+        </div>
+
+        <!-- Bloc de saisie du score et validation -->
+        <div class="score-input-section">
+          
+          <div class="input-container">
+            <div class="input-header-label">Score final</div>
+            <ion-item lines="none" class="score-input-item">
+              <ion-icon name="football-outline" slot="start" class="ball-icon"></ion-icon>
+              <ion-input 
+                placeholder="Ex: 2-1" 
+                [(ngModel)]="scores[ev.id!]"
+                class="score-text-input">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <ion-button 
+            class="btn-valider"
+            [disabled]="!scores[ev.id!]"
+            (click)="enregistrerScore(ev)">
+            <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+            Valider
           </ion-button>
+
         </div>
+
       </div>
 
+      <!-- État vide si tous les matchs sont scorés -->
       <div class="liste-vide" *ngIf="evenements.length === 0">
-        <span>Aucun événement en attente de score.</span>
+        <div class="empty-icon-wrap">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <h3>Tous les scores sont saisis</h3>
+        <p>Il n'y a aucun match en attente de résultat. Tous les paris associés ont été évalués.</p>
+        <ion-button fill="outline" routerLink="/tabs/evenements" class="btn-retour-events">
+          <ion-icon slot="start" name="calendar-outline"></ion-icon>
+          Voir les événements
+        </ion-button>
       </div>
+
     </div>
 
   </div>

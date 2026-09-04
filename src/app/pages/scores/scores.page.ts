@@ -1,13 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { 
   IonContent, IonItem, IonInput, IonButton, IonIcon, 
   IonButtons, IonBackButton, IonBadge, LoadingController,
   ToastController 
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline } from 'ionicons/icons';
+import { 
+  checkmarkOutline, footballOutline, timeOutline, 
+  informationCircleOutline, checkmarkCircleOutline, 
+  calendarOutline, shieldOutline
+} from 'ionicons/icons';
 import { EvenementsService } from '../../core/services/evenements.service';
 import { ClubsService } from '../../core/services/clubs.service';
 import { ParisService } from '../../core/services/paris.service'; // <-- AJOUTÉ
@@ -18,7 +23,7 @@ import { Club } from '../../core/models/club.model';
   selector: 'app-scores',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, IonContent, IonItem, IonInput, IonButton, 
+    CommonModule, FormsModule, RouterModule, IonContent, IonItem, IonInput, IonButton, 
     IonIcon, IonButtons, IonBackButton, IonBadge
   ],
   templateUrl: './scores.page.html',
@@ -37,7 +42,11 @@ export class ScoresPage implements OnInit {
     private toastCtrl: ToastController,
     private cdr: ChangeDetectorRef
   ) {
-    addIcons({ checkmarkOutline });
+    addIcons({ 
+      checkmarkOutline, footballOutline, timeOutline, 
+      informationCircleOutline, checkmarkCircleOutline, 
+      calendarOutline, shieldOutline 
+    });
   }
 
   async ngOnInit() {
@@ -67,6 +76,22 @@ export class ScoresPage implements OnInit {
 
   getNomClub(id: string): string {
     return this.clubsMap[id]?.nom || 'Inconnu';
+  }
+
+  getLogoClub(id: string): string | undefined {
+    return this.clubsMap[id]?.logoUrl;
+  }
+
+  getInitiales(nom: string): string {
+    if (!nom || nom === 'Inconnu') return '?';
+    const parts = nom.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  appliquerScore(eventId: string, score: string) {
+    this.scores[eventId] = score;
+    this.cdr.detectChanges();
   }
 
   async enregistrerScore(ev: Evenement) {

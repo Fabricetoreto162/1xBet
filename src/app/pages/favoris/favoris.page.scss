@@ -1,7 +1,757 @@
-.liste-raccourcis {
+:host {
+  display: block;
+  height: 100%;
+  background: var(--app-background, #f8fafc);
+}
+
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--app-background, #f8fafc);
+  padding-bottom: 100px; /* Espace suffisant pour la tab-bar et le bouton coupon flottant */
+}
+
+/* ==========================================================================
+   1. EN-TÊTE DE LA PAGE FAVORIS
+   ========================================================================== */
+.favoris-header {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--app-border-subtle, #e2e8f0);
+  padding: 14px 16px;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .badge-favoris {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #d97706;
+
+      ion-icon {
+        font-size: 12px;
+        color: #f59e0b;
+      }
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--app-text, #0f172a);
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+  }
+
+  /* Pilule de solde interactive */
+  .balance-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 9999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: left;
+    outline: none;
+
+    &:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    .wallet-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--app-primary, #065697);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .wallet-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+
+      .wallet-label {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        text-transform: uppercase;
+      }
+
+      .wallet-amount {
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--app-primary, #065697);
+
+        small {
+          font-size: 10px;
+          font-weight: 700;
+          color: #64748b;
+          margin-left: 2px;
+        }
+      }
+    }
+
+    .wallet-chevron {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-left: 2px;
+    }
+  }
+}
+
+/* ==========================================================================
+   2. CORPS DE LA PAGE
+   ========================================================================== */
+.favoris-body {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+/* ==========================================================================
+   3. CARTE HERO DU JOUEUR (1xBet Style)
+   ========================================================================== */
+.player-hero-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #07192f 0%, #064073 60%, #086bb5 100%);
+  border-radius: 20px;
+  padding: 18px 20px;
+  color: #ffffff;
+  box-shadow: 0 10px 24px -6px rgba(7, 25, 47, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* Lueur décorative en arrière-plan */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-top-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+
+    .player-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #07192f;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .player-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .player-header-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .greeting-tag {
+          font-size: 9.5px;
+          font-weight: 800;
+          letter-spacing: 0.8px;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .account-status {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 9999px;
+          background: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+          border: 1px solid rgba(245, 158, 11, 0.35);
+
+          &.configured {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.35);
+          }
+
+          ion-icon {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .player-name {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .player-id {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.65);
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .hero-actions-row {
+    position: relative;
+    z-index: 2;
+
+    .btn-profile-action {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      outline: none;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      ion-icon:first-child {
+        font-size: 16px;
+        color: #60a5fa;
+      }
+
+      span {
+        flex: 1;
+        text-align: left;
+      }
+
+      .btn-arrow {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   4. SECTIONS & TITRES DE GROUPE
+   ========================================================================== */
+.section-group {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  padding-top: 230px !important;
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+
+    .title-with-bullet {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .bullet-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--app-primary, #065697);
+
+        &.accent {
+          background: #d97706;
+        }
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        color: var(--app-text-secondary, #64748b);
+        text-transform: uppercase;
+      }
+    }
+
+    .section-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+  }
+}
+
+/* ==========================================================================
+   5. CARTES RACCOURCIS PRINCIPAUX
+   ========================================================================== */
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shortcut-card {
+  display: flex;
+  align-items: stretch;
+  background: #ffffff;
+  border: 1px solid var(--app-border-subtle, #e2e8f0);
+  border-radius: 18px;
+  padding: 16px;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  user-select: none;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    border-color: #cbd5e1;
+
+    .cta-circle {
+      transform: translateX(3px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.985);
+  }
+
+  /* Bulle de l'icône */
+  .card-icon-container {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 2px;
+
+    .card-icon-bubble {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: transform 0.2s ease;
+    }
+  }
+
+  /* Contenu textuel */
+  .card-body-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .card-header-badge {
+      margin-bottom: 6px;
+
+      .promo-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        padding: 2px 7px;
+        border-radius: 6px;
+        background: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
+
+        ion-icon {
+          font-size: 11px;
+        }
+      }
+
+      .counter-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        color: #475569;
+
+        &.has-items {
+          background: #ecfdf5;
+          color: #059669;
+          border: 1px solid #a7f3d0;
+        }
+      }
+
+      .scores-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: #ecfdf5;
+        color: #059669;
+
+        &.alert {
+          background: #fef2f2;
+          color: #dc2626;
+          border: 1px solid #fecaca;
+        }
+
+        .pulse-indicator {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #ef4444;
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+          animation: scorePulse 1.6s infinite;
+        }
+      }
+    }
+
+    .card-headline {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--app-text, #0f172a);
+      line-height: 1.25;
+    }
+
+    .card-description {
+      margin: 0 0 12px;
+      font-size: 12.5px;
+      color: var(--app-text-secondary, #64748b);
+      line-height: 1.45;
+    }
+
+    .card-footer-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px dashed var(--app-border-subtle, #e2e8f0);
+      padding-top: 10px;
+      margin-top: auto;
+
+      .cta-label {
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .cta-circle {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        transition: transform 0.2s ease;
+      }
+    }
+  }
+
+  /* Thème 1 : Créer Coupon (Bleu 1xBet & Cyan) */
+  &.primary-theme {
+    .card-icon-bubble {
+      background: #eff6ff;
+      color: #065697;
+      border: 1px solid #bfdbfe;
+    }
+
+    .cta-label {
+      color: #065697;
+    }
+
+    .cta-circle {
+      background: #eff6ff;
+      color: #065697;
+    }
+  }
+
+  /* Thème 2 : Mes Combinés (Émeraude) */
+  &.secondary-theme {
+    .card-icon-bubble {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .cta-label {
+      color: #059669;
+    }
+
+    .cta-circle {
+      background: #ecfdf5;
+      color: #059669;
+    }
+  }
+
+  /* Thème 3 : Scores (Orange & Rouge) */
+  &.scores-theme {
+    .card-icon-bubble {
+      background: #fff7ed;
+      color: #ea580c;
+      border: 1px solid #fed7aa;
+    }
+
+    .cta-label {
+      color: #ea580c;
+    }
+
+    .cta-circle {
+      background: #fff7ed;
+      color: #ea580c;
+    }
+  }
+}
+
+@keyframes scorePulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* ==========================================================================
+   6. GRILLE CATALOGUE GESTION SPORTIVE
+   ========================================================================== */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+
+  .catalog-tile {
+    background: #ffffff;
+    border: 1px solid var(--app-border-subtle, #e2e8f0);
+    border-radius: 16px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    outline: none;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      border-color: #cbd5e1;
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    .tile-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .tile-details {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.15;
+
+      .tile-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--app-text, #0f172a);
+        white-space: nowrap;
+      }
+
+      .tile-count {
+        font-size: 17px;
+        font-weight: 900;
+        color: var(--app-text, #0f172a);
+        margin: 2px 0 1px;
+      }
+
+      .tile-sub {
+        font-size: 9.5px;
+        font-weight: 600;
+        color: var(--app-text-secondary, #64748b);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    .tile-arrow {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Couleurs des tuiles */
+    &.clubs-tile {
+      .tile-icon-box {
+        background: #eff6ff;
+        color: #065697;
+        border: 1px solid #bfdbfe;
+      }
+      .tile-count {
+        color: #065697;
+      }
+    }
+
+    &.leagues-tile {
+      .tile-icon-box {
+        background: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fde68a;
+      }
+      .tile-count {
+        color: #d97706;
+      }
+    }
+
+    &.events-tile {
+      .tile-icon-box {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+      }
+      .tile-count {
+        color: #059669;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   7. BANNIÈRE ASTUCE VIP 1XBET
+   ========================================================================== */
+.pro-tip-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  padding: 14px 16px;
+
+  .tip-icon {
+    font-size: 22px;
+    color: #0284c7;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .tip-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    strong {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0369a1;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: #0c4a6e;
+      line-height: 1.45;
+    }
+  }
 }

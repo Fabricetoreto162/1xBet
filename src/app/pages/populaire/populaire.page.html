@@ -1,11 +1,181 @@
-<ion-content>
-  <div class="liste-raccourcis">
-    <app-carte-raccourci
-      *ngFor="let item of raccourcis"
-      [icone]="item.icone"
-      [titre]="item.titre"
-      [sousTitre]="item.sousTitre"
-      (clic)="aller(item.route)">
-    </app-carte-raccourci>
+<ion-content [fullscreen]="true">
+  <div class="populaire-container">
+
+    <!-- En-tête utilisateur 1xBet -->
+    <div class="user-hero-bar" *ngIf="profil">
+      <div class="user-info">
+        <div class="avatar-circle">
+          <span>{{ (profil.prenom ? profil.prenom.charAt(0) : 'U') | uppercase }}</span>
+        </div>
+        <div class="user-text">
+          <span class="greeting">Bienvenue,</span>
+          <h2 class="user-name">{{ profil.prenom }} {{ profil.nom }}</h2>
+          <span class="user-id">ID: {{ userId }}</span>
+        </div>
+      </div>
+
+      <div class="user-balance-pill" (click)="aller('/solde')">
+        <div class="balance-icon">
+          <ion-icon name="wallet-outline"></ion-icon>
+        </div>
+        <div class="balance-details">
+          <span class="balance-label">SOLDE DISPONIBLE</span>
+          <span class="balance-amount">{{ solde | number:'1.0-0' }} <small>XAF</small></span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="pill-arrow"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Section : Raccourcis de Gestion Rapide -->
+    <div class="section-block">
+      <div class="section-header">
+        <h3>Gestion Rapide</h3>
+        <span class="badge-count">{{ nombreClubs }} clubs • {{ nombreChampionnats }} ligues</span>
+      </div>
+
+      <div class="quick-column">
+        <!-- Carte Clubs -->
+        <div class="action-card" (click)="aller('/clubs')">
+          <div class="card-icon-wrap clubs-theme">
+            <ion-icon name="shield-outline"></ion-icon>
+          </div>
+          <div class="card-meta">
+            <span class="card-title">Mes Clubs</span>
+            <span class="card-sub">{{ nombreClubs }} clubs configurés</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="card-arrow"></ion-icon>
+        </div>
+
+        <!-- Carte Championnats -->
+        <div class="action-card" (click)="aller('/championnats')">
+          <div class="card-icon-wrap leagues-theme">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+          <div class="card-meta">
+            <span class="card-title">Championnats</span>
+            <span class="card-sub">{{ nombreChampionnats }} ligues actives</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="card-arrow"></ion-icon>
+        </div>
+
+        <!-- Carte Créer un match -->
+        <div class="action-card highlight-card" (click)="allerCreerMatch()">
+          <div class="card-icon-wrap create-theme">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </div>
+          <div class="card-meta">
+            <span class="card-title">Créer un Match</span>
+            <span class="card-sub">Configurer équipes & cotes</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="card-arrow"></ion-icon>
+        </div>
+
+        <!-- Carte Mes Événements -->
+        <div class="action-card" (click)="allerListeMatchs()">
+          <div class="card-icon-wrap events-theme">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div class="card-meta">
+            <span class="card-title">Tous les Matchs</span>
+            <span class="card-sub">{{ evenements.length }} rencontres</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="card-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section : Matchs Populaires / En cours -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="header-with-badge">
+          <h3>Matchs Populaires</h3>
+          <span class="live-pill" *ngIf="evenements.length > 0">
+            <span class="live-dot"></span>
+            ACTIFS ({{ evenements.length }})
+          </span>
+        </div>
+        <button type="button" class="btn-link" (click)="allerListeMatchs()" *ngIf="evenements.length > 0">
+          Voir tout
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Liste des cartes de match -->
+      <div class="matches-list" *ngIf="evenements.length > 0">
+        <div class="match-card" *ngFor="let ev of evenements">
+          
+          <div class="match-top">
+            <div class="league-info">
+              <ion-icon name="trophy-outline"></ion-icon>
+              <span>{{ getNomChampionnat(ev.championnatId) }}</span>
+            </div>
+            <div class="match-time">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ ev.dateHeure | date:'dd MMM, HH:mm' }}</span>
+            </div>
+          </div>
+
+          <div class="match-teams">
+            <!-- Domicile -->
+            <div class="team-unit">
+              <div class="team-avatar">
+                <img *ngIf="getLogoClub(ev.equipeADomicileId)" [src]="getLogoClub(ev.equipeADomicileId)" [alt]="getNomClub(ev.equipeADomicileId)" />
+                <ion-icon *ngIf="!getLogoClub(ev.equipeADomicileId)" name="shield-outline"></ion-icon>
+              </div>
+              <span class="team-label">{{ getNomClub(ev.equipeADomicileId) }}</span>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="vs-circle">
+              <span>VS</span>
+            </div>
+
+            <!-- Extérieur -->
+            <div class="team-unit">
+              <div class="team-avatar">
+                <img *ngIf="getLogoClub(ev.equipeExterieurId)" [src]="getLogoClub(ev.equipeExterieurId)" [alt]="getNomClub(ev.equipeExterieurId)" />
+                <ion-icon *ngIf="!getLogoClub(ev.equipeExterieurId)" name="shield-outline"></ion-icon>
+              </div>
+              <span class="team-label">{{ getNomClub(ev.equipeExterieurId) }}</span>
+            </div>
+          </div>
+
+          <!-- Barre de cote et action pari -->
+          <div class="match-market-bar">
+            <div class="market-name">
+              <span class="label">Total Buts :</span>
+              <span class="selection">{{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }}</span>
+            </div>
+            <button type="button" class="odd-button" (click)="placerPariRapide(ev)">
+              <span class="odd-type">Cote</span>
+              <span class="odd-value">{{ ev.cote | number:'1.2-2' }}</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- État vide : Aucun événement -->
+      <div class="empty-dashboard-card" *ngIf="evenements.length === 0">
+        <div class="empty-icon-box">
+          <ion-icon name="flame-outline"></ion-icon>
+        </div>
+        <h4>Aucun événement populaire</h4>
+        <p>Commencez par ajouter vos clubs et championnats, puis programmez votre premier match avec ses cotes.</p>
+        
+        <div class="empty-buttons">
+          <ion-button class="btn-create-empty" (click)="allerCreerMatch()">
+            <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+            Créer mon premier match
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="aller('/clubs')">
+            <ion-icon slot="start" name="shield-outline"></ion-icon>
+            Gérer mes clubs ({{ nombreClubs }})
+          </ion-button>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </ion-content>

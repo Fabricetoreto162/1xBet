@@ -1,24 +1,231 @@
-<ion-content>
-  <div class="liste-raccourcis">
-    <app-carte-raccourci
-      icone="person-circle-outline"
-      [titre]="titreBoutonProfil"
-      [sousTitre]="sousTitreBoutonProfil"
-      (clic)="allerProfil()">
-    </app-carte-raccourci>
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête de la page Favoris -->
+    <header class="favoris-header">
+      <div class="header-content">
+        <div class="header-titles">
+          <div class="badge-favoris">
+            <ion-icon name="star"></ion-icon>
+            <span>ESPACE PRIVILÈGE</span>
+          </div>
+          <h1 class="page-title">Favoris & Outils</h1>
+        </div>
 
-    <app-carte-raccourci
-      icone="add-circle-outline"
-      titre="Créer un coupon"
-      sousTitre="Sélectionner des événements pour composer un pari"
-      (clic)="creerCoupon()">
-    </app-carte-raccourci>
+        <!-- Pilule solde cliquable -->
+        <button type="button" class="balance-pill" (click)="allerSolde()" aria-label="Voir le solde">
+          <div class="wallet-icon">
+            <ion-icon name="wallet-outline"></ion-icon>
+          </div>
+          <div class="wallet-text">
+            <span class="wallet-label">SOLDE</span>
+            <span class="wallet-amount">{{ solde | number:'1.0-0' }} <small>XAF</small></span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="wallet-chevron"></ion-icon>
+        </button>
+      </div>
+    </header>
 
-    <app-carte-raccourci
-      icone="football-outline"
-      titre="Saisir les scores"
-      sousTitre="Renseigner le résultat final de chaque match"
-      (clic)="saisirScores()">
-    </app-carte-raccourci>
+    <main class="favoris-body">
+      
+      <!-- Carte Joueur Hero 1xBet -->
+      <section class="player-hero-card">
+        <div class="hero-top-row">
+          <div class="player-avatar">
+            <span>{{ initiales }}</span>
+          </div>
+
+          <div class="player-info">
+            <div class="player-header-line">
+              <span class="greeting-tag">COMPTE JOUEUR</span>
+              <span class="account-status" [class.configured]="profilExiste">
+                <ion-icon [name]="profilExiste ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
+                {{ profilExiste ? 'Vérifié' : 'Incomplet' }}
+              </span>
+            </div>
+            <h2 class="player-name">{{ nomAffiche }}</h2>
+            <span class="player-id">ID: {{ userId || '1X-DEFAULT' }}</span>
+          </div>
+        </div>
+
+        <div class="hero-actions-row">
+          <button type="button" class="btn-profile-action" (click)="allerProfil()">
+            <ion-icon name="create-outline"></ion-icon>
+            <span>{{ titreBoutonProfil }}</span>
+            <ion-icon name="chevron-forward-outline" class="btn-arrow"></ion-icon>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section Actions Favoris -->
+      <section class="section-group">
+        <div class="section-title-row">
+          <div class="title-with-bullet">
+            <span class="bullet-dot"></span>
+            <h3>ACTIONS FAVORITES</h3>
+          </div>
+          <span class="section-badge">Accès direct</span>
+        </div>
+
+        <div class="shortcuts-list">
+          
+          <!-- Carte 1 : Créer un coupon combiné -->
+          <div class="shortcut-card primary-theme" (click)="creerCoupon()">
+            <div class="card-icon-container">
+              <div class="card-icon-bubble">
+                <ion-icon name="ticket-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="card-body-content">
+              <div class="card-header-badge">
+                <span class="promo-tag">
+                  <ion-icon name="flash-outline"></ion-icon>
+                  MULTIPLICATEUR
+                </span>
+              </div>
+              <h4 class="card-headline">Créer un coupon combiné</h4>
+              <p class="card-description">
+                Associez plusieurs événements sportifs pour multiplier vos cotes et générer un code de pari unique.
+              </p>
+              
+              <div class="card-footer-cta">
+                <span class="cta-label">Composer un coupon</span>
+                <div class="cta-circle">
+                  <ion-icon name="arrow-forward-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte 2 : Mes coupons générés -->
+          <div class="shortcut-card secondary-theme" (click)="voirCombiners()">
+            <div class="card-icon-container">
+              <div class="card-icon-bubble">
+                <ion-icon name="layers-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="card-body-content">
+              <div class="card-header-badge">
+                <span class="counter-badge" [class.has-items]="nombreCombiners > 0">
+                  {{ nombreCombiners }} coupon{{ nombreCombiners > 1 ? 's' : '' }}
+                </span>
+              </div>
+              <h4 class="card-headline">Mes coupons créés</h4>
+              <p class="card-description">
+                Retrouvez tous vos coupons combinés enregistrés, rechargez leurs sélections et partagez vos codes.
+              </p>
+
+              <div class="card-footer-cta">
+                <span class="cta-label">Consulter la liste</span>
+                <div class="cta-circle">
+                  <ion-icon name="arrow-forward-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte 3 : Saisie des scores -->
+          <div class="shortcut-card scores-theme" (click)="saisirScores()">
+            <div class="card-icon-container">
+              <div class="card-icon-bubble">
+                <ion-icon name="football-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="card-body-content">
+              <div class="card-header-badge">
+                <span class="scores-badge" [class.alert]="nombreMatchsSansScore > 0">
+                  <span class="pulse-indicator" *ngIf="nombreMatchsSansScore > 0"></span>
+                  {{ nombreMatchsSansScore > 0 ? (nombreMatchsSansScore + ' en attente') : 'À jour' }}
+                </span>
+              </div>
+              <h4 class="card-headline">Saisie des résultats & scores</h4>
+              <p class="card-description">
+                Indiquez les scores finaux des rencontres pour régler automatiquement les paris en attente de résultat.
+              </p>
+
+              <div class="card-footer-cta">
+                <span class="cta-label">Saisir les scores</span>
+                <div class="cta-circle">
+                  <ion-icon name="arrow-forward-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section Gestion Sportive Rapide (Grille Bento 3) -->
+      <section class="section-group">
+        <div class="section-title-row">
+          <div class="title-with-bullet">
+            <span class="bullet-dot accent"></span>
+            <h3>GESTION DU CATALOGUE</h3>
+          </div>
+          <span class="section-badge">{{ nombreClubs + nombreChampionnats + nombreEvenements }} éléments</span>
+        </div>
+
+        <div class="catalog-grid">
+          
+          <!-- Case Clubs -->
+          <button type="button" class="catalog-tile clubs-tile" (click)="allerClubs()">
+            <div class="tile-icon-box">
+              <ion-icon name="shield-outline"></ion-icon>
+            </div>
+            <div class="tile-details">
+              <span class="tile-label">Mes Clubs</span>
+              <strong class="tile-count">{{ nombreClubs }}</strong>
+              <span class="tile-sub">équipes</span>
+            </div>
+            <ion-icon name="chevron-forward-outline" class="tile-arrow"></ion-icon>
+          </button>
+
+          <!-- Case Championnats -->
+          <button type="button" class="catalog-tile leagues-tile" (click)="allerChampionnats()">
+            <div class="tile-icon-box">
+              <ion-icon name="trophy-outline"></ion-icon>
+            </div>
+            <div class="tile-details">
+              <span class="tile-label">Ligues</span>
+              <strong class="tile-count">{{ nombreChampionnats }}</strong>
+              <span class="tile-sub">tournois</span>
+            </div>
+            <ion-icon name="chevron-forward-outline" class="tile-arrow"></ion-icon>
+          </button>
+
+          <!-- Case Événements -->
+          <button type="button" class="catalog-tile events-tile" (click)="allerEvenements()">
+            <div class="tile-icon-box">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+            <div class="tile-details">
+              <span class="tile-label">Matchs</span>
+              <strong class="tile-count">{{ nombreEvenements }}</strong>
+              <span class="tile-sub">rencontres</span>
+            </div>
+            <ion-icon name="chevron-forward-outline" class="tile-arrow"></ion-icon>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- Bannière Astuce 1xBet -->
+      <div class="pro-tip-banner">
+        <div class="tip-icon">
+          <ion-icon name="sparkles-outline"></ion-icon>
+        </div>
+        <div class="tip-text">
+          <strong>Astuce Combiné 1xBet</strong>
+          <p>
+            En combinant au moins 2 sélections, les cotes se multiplient entre elles pour démultiplier vos gains potentiels en un clic.
+          </p>
+        </div>
+      </div>
+
+    </main>
+
   </div>
-</ion-content>
+</ion-content>

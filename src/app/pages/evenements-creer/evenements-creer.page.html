@@ -1,62 +1,245 @@
 <ion-content [fullscreen]="true">
-  <div class="custom-header">
-    <ion-buttons>
-      <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
-    </ion-buttons>
-    <h1>{{ isEditMode ? 'Modifier l\'événement' : 'Créer un événement' }}</h1>
-  </div>
-
-  <div class="formulaire">
-    <ion-item>
-      <ion-select label="Équipe à domicile" labelPlacement="stacked" [(ngModel)]="equipeADomicileId" placeholder="Choisir un club">
-        <ion-select-option *ngFor="let c of clubs" [value]="c.id">{{ c.nom }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-select label="Équipe à l'extérieur" labelPlacement="stacked" [(ngModel)]="equipeExterieurId" placeholder="Choisir un club">
-        <ion-select-option *ngFor="let c of clubs" [value]="c.id">{{ c.nom }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-select label="Championnat" labelPlacement="stacked" [(ngModel)]="championnatId" placeholder="Choisir un championnat">
-        <ion-select-option *ngFor="let c of championnats" [value]="c.id">{{ c.nom }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <div class="champ-date">
-      <label>Date et heure</label>
-      <input type="datetime-local" [(ngModel)]="dateHeure" />
+  <div class="page-wrap">
+    
+    <!-- En-tête avec navigation et info utilisateur -->
+    <div class="custom-header">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/populaire" text=""></ion-back-button>
+      </ion-buttons>
+      <div class="header-titles">
+        <h1>{{ isEditMode ? 'Modifier le match' : 'Créer un match' }}</h1>
+        <span class="user-sub" *ngIf="profil">
+          <ion-icon name="person-outline"></ion-icon>
+          {{ profil.prenom }} {{ profil.nom }}
+        </span>
+      </div>
+      <ion-button fill="clear" size="small" class="btn-link-list" (click)="allerVersListe()">
+        <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+      </ion-button>
     </div>
 
-    <div class="bloc-total">
-      <span class="titre-bloc">Option Total</span>
-      <ion-segment [(ngModel)]="sens">
-        <ion-segment-button value="plus"><ion-label>Plus de</ion-label></ion-segment-button>
-        <ion-segment-button value="moins"><ion-label>Moins de</ion-label></ion-segment-button>
-      </ion-segment>
-      <ion-item>
-        <ion-input label="Seuil (ex. 2.5)" labelPlacement="stacked" type="number" inputmode="decimal" step="any" [(ngModel)]="seuilTotal"></ion-input>
+    <!-- Avertissement si pas de clubs ou pas de championnats -->
+    <div class="prerequis-alert" *ngIf="clubs.length < 2 || championnats.length === 0">
+      <div class="alert-icon">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+      </div>
+      <div class="alert-content">
+        <h4>Configuration requise</h4>
+        <p *ngIf="clubs.length < 2">
+          Vous devez posséder au moins 2 clubs pour configurer une rencontre.
+        </p>
+        <p *ngIf="championnats.length === 0">
+          Vous devez enregistrer au moins un championnat.
+        </p>
+        <div class="alert-actions">
+          <ion-button size="small" fill="outline" color="primary" *ngIf="clubs.length < 2" (click)="allerVersClubs()">
+            <ion-icon slot="start" name="shield-outline"></ion-icon>
+            Ajouter des clubs
+          </ion-button>
+          <ion-button size="small" fill="outline" color="warning" *ngIf="championnats.length === 0" (click)="allerVersChampionnats()">
+            <ion-icon slot="start" name="trophy-outline"></ion-icon>
+            Ajouter un championnat
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aperçu dynamique du match en direct -->
+    <div class="match-preview-card" *ngIf="equipeADomicileId || equipeExterieurId">
+      <div class="preview-header">
+        <span class="preview-tag">
+          <ion-icon name="trophy-outline"></ion-icon>
+          {{ championnatSelectionne ? championnatSelectionne.nom : 'Championnat à définir' }}
+        </span>
+        <span class="preview-date" *ngIf="dateHeure">
+          <ion-icon name="time-outline"></ion-icon>
+          {{ dateHeure | date:'dd MMM, HH:mm' }}
+        </span>
+      </div>
+
+      <div class="preview-teams-duel">
+        <!-- Équipe Domicile -->
+        <div class="preview-team domicile">
+          <div class="team-badge">
+            <img *ngIf="clubDomicile?.logoUrl" [src]="clubDomicile!.logoUrl" [alt]="clubDomicile!.nom" />
+            <ion-icon *ngIf="!clubDomicile?.logoUrl" name="shield-outline"></ion-icon>
+          </div>
+          <span class="team-name">{{ clubDomicile ? clubDomicile.nom : 'Équipe domicile' }}</span>
+          <span class="team-role">DOMICILE</span>
+        </div>
+
+        <!-- VS -->
+        <div class="preview-vs-badge">
+          <span>VS</span>
+        </div>
+
+        <!-- Équipe Extérieur -->
+        <div class="preview-team exterieur">
+          <div class="team-badge">
+            <img *ngIf="clubExterieur?.logoUrl" [src]="clubExterieur!.logoUrl" [alt]="clubExterieur!.nom" />
+            <ion-icon *ngIf="!clubExterieur?.logoUrl" name="shield-outline"></ion-icon>
+          </div>
+          <span class="team-name">{{ clubExterieur ? clubExterieur.nom : 'Équipe extérieur' }}</span>
+          <span class="team-role">EXTÉRIEUR</span>
+        </div>
+      </div>
+
+      <!-- Aperçu de la cote choisie -->
+      <div class="preview-bet-strip" *ngIf="seuilTotal && cote">
+        <span class="bet-label">Option Total :</span>
+        <span class="bet-value">{{ sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ seuilTotal }} buts</span>
+        <span class="bet-odd">Cote {{ cote | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Formulaire moderne de configuration de l'événement -->
+    <div class="card-formulaire">
+      
+      <!-- Section 1 : Sélection des équipes -->
+      <div class="form-section-title">
+        <ion-icon name="shield-outline"></ion-icon>
+        <span>1. Les Équipes</span>
+      </div>
+
+      <ion-item lines="none" class="input-select-item">
+        <ion-select 
+          label="Équipe à domicile" 
+          labelPlacement="stacked" 
+          [(ngModel)]="equipeADomicileId" 
+          placeholder="Choisir l'équipe recevante">
+          <ion-select-option *ngFor="let c of clubs" [value]="c.id">{{ c.nom }}</ion-select-option>
+        </ion-select>
       </ion-item>
+
+      <ion-item lines="none" class="input-select-item">
+        <ion-select 
+          label="Équipe à l'extérieur" 
+          labelPlacement="stacked" 
+          [(ngModel)]="equipeExterieurId" 
+          placeholder="Choisir l'équipe visiteuse">
+          <ion-select-option *ngFor="let c of clubs" [value]="c.id" [disabled]="c.id === equipeADomicileId">
+            {{ c.nom }} {{ c.id === equipeADomicileId ? '(Déjà sélectionnée)' : '' }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Section 2 : Championnat & Date -->
+      <div class="form-section-title">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <span>2. Championnat & Calendrier</span>
+      </div>
+
+      <ion-item lines="none" class="input-select-item">
+        <ion-select 
+          label="Championnat" 
+          labelPlacement="stacked" 
+          [(ngModel)]="championnatId" 
+          placeholder="Sélectionner la compétition">
+          <ion-select-option *ngFor="let c of championnats" [value]="c.id">{{ c.nom }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="champ-date-box">
+        <label>
+          <ion-icon name="calendar-outline"></ion-icon>
+          Date et heure du coup d'envoi
+        </label>
+        <input type="datetime-local" [(ngModel)]="dateHeure" class="date-native-input" />
+
+        <!-- Raccourcis de date -->
+        <div class="quick-chips">
+          <button type="button" class="quick-chip" (click)="appliquerDatePreset(0, 20, 0)">Aujourd'hui 20h</button>
+          <button type="button" class="quick-chip" (click)="appliquerDatePreset(1, 20, 45)">Demain 20h45</button>
+          <button type="button" class="quick-chip" (click)="appliquerDatePreset(2, 21, 0)">Dans 2j 21h</button>
+        </div>
+      </div>
+
+      <!-- Section 3 : Marché de paris (Total de buts) -->
+      <div class="form-section-title">
+        <ion-icon name="trending-up-outline"></ion-icon>
+        <span>3. Marché de paris (Total de buts)</span>
+      </div>
+
+      <div class="bloc-total">
+        <span class="titre-bloc">Direction du pari</span>
+        <ion-segment [(ngModel)]="sens" mode="ios" class="custom-segment">
+          <ion-segment-button value="plus">
+            <ion-label>Plus de (+)</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="moins">
+            <ion-label>Moins de (-)</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <ion-item lines="none" class="input-item">
+          <ion-input 
+            label="Seuil de buts (jusqu'à 5.5)" 
+            labelPlacement="stacked" 
+            type="number" 
+            inputmode="decimal" 
+            step="0.5" 
+            min="0.5"
+            max="5.5"
+            [(ngModel)]="seuilTotal"
+            placeholder="Ex. 2.5">
+          </ion-input>
+        </ion-item>
+
+        <!-- Raccourcis de seuils -->
+        <div class="quick-chips">
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 0.5" (click)="appliquerSeuil(0.5)">0.5</button>
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 1.5" (click)="appliquerSeuil(1.5)">1.5</button>
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 2.5" (click)="appliquerSeuil(2.5)">2.5</button>
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 3.5" (click)="appliquerSeuil(3.5)">3.5</button>
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 4.5" (click)="appliquerSeuil(4.5)">4.5</button>
+          <button type="button" class="quick-chip" [class.active]="seuilTotal === 5.5" (click)="appliquerSeuil(5.5)">5.5</button>
+        </div>
+      </div>
+
+      <!-- Section Cote -->
+      <ion-item lines="none" class="input-item">
+        <ion-input 
+          label="Cote du pari (ex. 1.85)" 
+          labelPlacement="stacked" 
+          type="number" 
+          inputmode="decimal" 
+          step="0.01" 
+          [(ngModel)]="cote" 
+          placeholder="Ex. 1.85">
+        </ion-input>
+      </ion-item>
+
+      <div class="quick-chips">
+        <span class="quick-label">Cotes rapides :</span>
+        <button type="button" class="quick-chip" [class.active]="cote === 1.55" (click)="appliquerCote(1.55)">1.55</button>
+        <button type="button" class="quick-chip" [class.active]="cote === 1.85" (click)="appliquerCote(1.85)">1.85</button>
+        <button type="button" class="quick-chip" [class.active]="cote === 2.10" (click)="appliquerCote(2.10)">2.10</button>
+        <button type="button" class="quick-chip" [class.active]="cote === 2.80" (click)="appliquerCote(2.80)">2.80</button>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <ion-button 
+          expand="block" 
+          class="btn-primary" 
+          [disabled]="!formulaireValide || enregistrement" 
+          (click)="sauvegarder()">
+          <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+          {{ isEditMode ? 'Enregistrer les modifications' : 'Publier le match' }}
+        </ion-button>
+
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="medium" 
+          class="btn-secondary" 
+          (click)="allerVersListe()">
+          <ion-icon slot="start" name="list-outline"></ion-icon>
+          Consulter mes événements
+        </ion-button>
+      </div>
+
     </div>
 
-    <ion-item>
-      <ion-input label="Cote" labelPlacement="stacked" type="number" inputmode="decimal" step="any" [(ngModel)]="cote" placeholder="Ex. 1.86"></ion-input>
-    </ion-item>
   </div>
 </ion-content>
-
-<!-- Utilisation de ion-footer pour éviter le bug du clavier -->
-<ion-footer class="ion-no-border">
-  <div class="bottom-buttons">
-    <ion-button expand="block" [disabled]="!formulaireValide || enregistrement" (click)="sauvegarder()">
-      <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-      {{ isEditMode ? 'Enregistrer' : 'Créer l\'événement' }}
-    </ion-button>
-
-    <ion-button expand="block" fill="outline" color="medium" (click)="allerVersListe()">
-      Voir la liste des événements
-    </ion-button>
-  </div>
-</ion-footer>

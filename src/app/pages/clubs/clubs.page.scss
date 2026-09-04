@@ -1,100 +1,291 @@
 .page-wrap {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
+  padding-bottom: 32px;
 }
 
 .custom-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 16px 8px 0 16px;
+  gap: 12px;
+  padding: 16px 16px 8px;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border-subtle);
 
-  h1 {
+  ion-buttons {
     margin: 0;
-    font-size: 24px;
+  }
+
+  .header-titles {
+    flex: 1;
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--app-text);
+      letter-spacing: -0.3px;
+    }
+
+    .user-sub {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--app-header-text);
+      font-weight: 600;
+      margin-top: 2px;
+
+      ion-icon {
+        font-size: 13px;
+      }
+    }
+  }
+
+  .count-badge {
+    --background: var(--app-primary);
+    font-size: 11px;
     font-weight: 700;
-    color: var(--app-text);
+    padding: 6px 10px;
+    border-radius: 12px;
   }
 }
 
-.formulaire {
+.search-container {
+  padding: 8px 16px 0;
+
+  ion-searchbar {
+    --background: var(--app-surface);
+    --border-radius: 12px;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --placeholder-color: var(--app-text-secondary);
+    --icon-color: var(--app-text-secondary);
+    padding: 0;
+  }
+}
+
+.card-formulaire {
+  background: var(--app-surface);
+  border-radius: 16px;
+  margin: 16px;
   padding: 16px;
-  flex-shrink: 0;
+  box-shadow: var(--app-surface-shadow);
+  border: 1px solid var(--app-border-subtle);
 
-  ion-item { 
-    --background: var(--app-surface); 
-    border-radius: 12px; 
-    margin-bottom: 10px; 
-  }
-  ion-button { margin-top: 6px; }
-}
-
-.upload-zone {
-  margin-bottom: 16px;
-  
-  .preview {
-    margin-top: 12px;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--app-surface);
+  .form-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    .icon-round {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(6, 86, 151, 0.1);
+      color: var(--app-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
     }
 
-    &.small {
-      width: 50px;
-      height: 50px;
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--app-text);
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--app-text-secondary);
+    }
+  }
+
+  .form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .input-item {
+      --background: #f8fafc;
+      --border-radius: 12px;
+      border: 1px solid var(--app-border-subtle);
+      border-radius: 12px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --padding-top: 4px;
+      --padding-bottom: 4px;
+    }
+  }
+
+  .upload-zone {
+    .logo-preview-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 1px dashed var(--app-border-subtle);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f1f5f9;
+      }
+
+      .preview-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: white;
+        border: 2px solid var(--app-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        &.empty {
+          border: 2px dashed #cbd5e1;
+          color: var(--app-text-secondary);
+          font-size: 22px;
+        }
+      }
+
+      .upload-texts {
+        display: flex;
+        flex-direction: column;
+
+        strong {
+          font-size: 13px;
+          color: var(--app-primary);
+        }
+
+        span {
+          font-size: 11px;
+          color: var(--app-text-secondary);
+          margin-top: 2px;
+        }
+      }
+    }
+  }
+
+  .btn-primary {
+    --background: var(--app-primary);
+    --border-radius: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+}
+
+.section-liste {
+  padding: 0 16px;
+
+  .section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--app-text);
+    }
+
+    .result-count {
+      font-size: 12px;
+      color: var(--app-text-secondary);
+      font-weight: 600;
     }
   }
 }
 
-.liste-clubs { 
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 16px 16px; 
+.liste-clubs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.club {
+.club-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   background: var(--app-surface);
   border-radius: 14px;
   padding: 12px 14px;
-  margin-bottom: 10px;
-  box-shadow: var(--app-surface-shadow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--app-border-subtle);
 
-  ion-avatar { 
-    width: 36px; 
-    height: 36px; 
-    flex-shrink: 0;
-  }
-  
-  .nom-club { 
-    font-size: 14px; 
-    font-weight: 600; 
-    color: var(--app-text);
+  .club-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     flex: 1;
+
+    .club-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      padding: 2px;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    .club-names {
+      display: flex;
+      flex-direction: column;
+
+      .nom-club {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--app-text);
+      }
+
+      .club-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        color: var(--app-success);
+        font-weight: 600;
+        margin-top: 2px;
+
+        ion-icon {
+          font-size: 12px;
+        }
+      }
+    }
   }
 
   .actions {
     display: flex;
     align-items: center;
-    
-    ion-button {
-      --padding-start: 8px;
-      --padding-end: 8px;
-      margin: 0;
+    gap: 4px;
+
+    .btn-edit {
+      --color: var(--app-primary);
     }
   }
 
@@ -102,22 +293,37 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    
-    ion-item {
-      --background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 0;
+    gap: 10px;
+
+    .edition-header {
+      font-size: 13px;
+      color: var(--app-primary);
+      font-weight: 700;
     }
 
-    .edit-zone {
-      margin-bottom: 0;
-      
-      .edit-preview-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
+    .input-item {
+      --background: #f8fafc;
+      border: 1px solid var(--app-border-subtle);
+      border-radius: 10px;
+    }
+
+    .edit-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .preview-mini {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--app-primary);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
       }
     }
 
@@ -131,6 +337,35 @@
 
 .liste-vide {
   text-align: center;
-  padding: 30px 0;
-  span { font-size: 13px; color: var(--app-text-secondary); }
+  padding: 36px 16px;
+  background: var(--app-surface);
+  border-radius: 16px;
+  border: 1px dashed var(--app-border-subtle);
+
+  .empty-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(6, 86, 151, 0.08);
+    color: var(--app-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 12px;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+
+  p {
+    margin: 6px auto 0;
+    font-size: 13px;
+    color: var(--app-text-secondary);
+    max-width: 280px;
+  }
 }

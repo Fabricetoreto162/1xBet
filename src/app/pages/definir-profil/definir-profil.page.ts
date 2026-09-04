@@ -35,9 +35,18 @@ export class DefinirProfilPage {
     const loading = await this.loadingCtrl.create({ message: 'Création du profil...', spinner: 'crescent' });
     await loading.present();
 
+    const prenomFinal = (this.profil.prenom || '')
+      .trim()
+      .toLowerCase()
+      .replace(/(?:^|[\s-])\S/g, (char) => char.toUpperCase());
+    const nomFinal = (this.profil.nom || '').trim().toUpperCase();
+
     try {
       // Le service génère l'ID, le stocke localement et l'enregistre dans Firebase
-      await this.profilSvc.sauvegarderProfil(this.profil);
+      await this.profilSvc.sauvegarderProfil({
+        prenom: prenomFinal,
+        nom: nomFinal
+      });
       this.router.navigateByUrl('/tabs', { replaceUrl: true });
     } catch (e) {
       console.error(e);

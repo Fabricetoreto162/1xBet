@@ -3,54 +3,124 @@
     
     <!-- En-tête personnalisé -->
     <div class="custom-header">
-      <ion-buttons>
-        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
-      </ion-buttons>
-      <h1>{{ titrePage }}</h1>
-    </div>
-
-    <!-- Carte info aperçu -->
-    <div class="carte-apercu">
-      <div class="avatar-cercle">
-        <ion-icon name="person-outline"></ion-icon>
-      </div>
-      <div class="apercu-infos">
-        <span class="libelle">Aperçu du profil</span>
-        <strong class="nom-affiche">
-          {{ prenom || nom ? (prenom + ' ' + nom) : 'Prénom & Nom' }}
-        </strong>
+      <div class="header-left">
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/tabs/menu" text=""></ion-back-button>
+        </ion-buttons>
+        <div class="header-titles">
+          <h1>{{ titrePage }}</h1>
+          <span class="sub-status">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            Espace Joueur Sécurisé
+          </span>
+        </div>
       </div>
     </div>
 
-    <!-- Formulaire -->
-    <div class="formulaire">
-      <ion-item>
-        <ion-input 
-          label="Prénom" 
-          labelPlacement="stacked" 
-          type="text" 
-          [(ngModel)]="prenom" 
-          placeholder="Ex. Fabrice">
-        </ion-input>
-      </ion-item>
+    <div class="content-container">
 
-      <ion-item>
-        <ion-input 
-          label="Nom" 
-          labelPlacement="stacked" 
-          type="text" 
-          [(ngModel)]="nom" 
-          placeholder="Ex. TOWANOU">
-        </ion-input>
-      </ion-item>
-      
-      <ion-button 
-        expand="block" 
-        [disabled]="enregistrement || !formulaireValide" 
-        (click)="enregistrer()">
-        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-        {{ texteBouton }}
-      </ion-button>
+      <!-- Carte de présentation du Profil -->
+      <div class="carte-apercu">
+        <div class="card-glow"></div>
+
+        <div class="apercu-top">
+          <span class="brand-tag">1xBet ID</span>
+          <span class="status-pill">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Profil Joueur
+          </span>
+        </div>
+
+        <div class="apercu-main">
+          <div class="avatar-cercle">
+            <span *ngIf="initiales" class="initiales-text">{{ initiales }}</span>
+            <ion-icon *ngIf="!initiales" name="person-outline"></ion-icon>
+          </div>
+          
+          <div class="apercu-infos">
+            <span class="libelle">Nom complet affiché</span>
+            <strong class="nom-affiche">{{ nomComplet }}</strong>
+            <span class="profil-statut" *ngIf="profilExiste">
+              Compte configuré et actif
+            </span>
+            <span class="profil-statut nouveau" *ngIf="!profilExiste">
+              Configuration de votre identité
+            </span>
+          </div>
+        </div>
+
+        <div class="apercu-footer">
+          <div class="security-chip">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <span>Données privées chiffrées</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire de saisie -->
+      <div class="formulaire-card">
+        
+        <div class="card-intro">
+          <h2>Vos Coordonnées</h2>
+          <p>Le nom sera automatiquement enregistré en <strong>MAJUSCULES</strong> et le prénom avec la <strong>première lettre en majuscule</strong>.</p>
+        </div>
+
+        <!-- Champ Prénom -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label class="field-label">Prénom</label>
+            <span class="format-badge">Ex: Fabrice</span>
+          </div>
+          <div class="input-container">
+            <ion-item lines="none" class="custom-input-item">
+              <ion-icon name="person-outline" slot="start" class="field-icon"></ion-icon>
+              <ion-input 
+                type="text"
+                [ngModel]="prenom" 
+                (ionInput)="surChangementPrenom($event)"
+                placeholder="Ex. Fabrice"
+                class="input-prenom"
+                autocomplete="given-name">
+              </ion-input>
+            </ion-item>
+          </div>
+          <span class="field-hint">1ère lettre en majuscule, reste en minuscules</span>
+        </div>
+
+        <!-- Champ Nom -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label class="field-label">Nom de famille</label>
+            <span class="format-badge uppercase-badge">TOUT EN MAJUSCULES</span>
+          </div>
+          <div class="input-container">
+            <ion-item lines="none" class="custom-input-item">
+              <ion-icon name="person-outline" slot="start" class="field-icon"></ion-icon>
+              <ion-input 
+                type="text"
+                [ngModel]="nom" 
+                (ionInput)="surChangementNom($event)"
+                placeholder="Ex. TOWANOU"
+                class="input-nom-maj"
+                autocomplete="family-name">
+              </ion-input>
+            </ion-item>
+          </div>
+          <span class="field-hint">Converti automatiquement en lettres majuscules</span>
+        </div>
+
+        <!-- Bouton d'action -->
+        <ion-button 
+          expand="block" 
+          class="btn-valider"
+          [disabled]="enregistrement || !formulaireValide" 
+          (click)="enregistrer()">
+          <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+          {{ texteBouton }}
+        </ion-button>
+
+      </div>
+
     </div>
 
   </div>

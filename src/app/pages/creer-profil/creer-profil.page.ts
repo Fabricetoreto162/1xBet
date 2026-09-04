@@ -7,9 +7,11 @@ import {
   IonBackButton, ToastController, LoadingController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkOutline, personOutline } from 'ionicons/icons';
+import { 
+  checkmarkOutline, personOutline, shieldCheckmarkOutline, 
+  sparklesOutline, lockClosedOutline, checkmarkCircleOutline
+} from 'ionicons/icons';
 import { ProfilService } from '../../core/services/profil.service';
-import { Profil } from '../../core/models/profil.model';
 
 @Component({
   selector: 'app-creer-profil',
@@ -34,7 +36,10 @@ export class CreerProfilPage implements OnInit {
     private loadingCtrl: LoadingController,
     private cdr: ChangeDetectorRef
   ) {
-    addIcons({ checkmarkOutline, personOutline });
+    addIcons({ 
+      checkmarkOutline, personOutline, shieldCheckmarkOutline, 
+      sparklesOutline, lockClosedOutline, checkmarkCircleOutline
+    });
   }
 
   async ngOnInit() {
@@ -48,9 +53,9 @@ export class CreerProfilPage implements OnInit {
   private async chargerProfil() {
     try {
       const p = await this.profilSvc.getProfil();
-      if (p) { // <-- Sécurité : on vérifie que p n'est pas null
-        this.prenom = p.prenom || '';
-        this.nom = p.nom || '';
+      if (p) {
+        this.prenom = this.formaterPrenom(p.prenom || '');
+        this.nom = (p.nom || '').toUpperCase();
       } else {
         this.prenom = '';
         this.nom = '';
@@ -64,21 +69,59 @@ export class CreerProfilPage implements OnInit {
   }
 
   get titrePage(): string {
-    return this.profilExiste ? 'Modifier mon profil' : 'Ajouter votre profil';
+    return this.profilExiste ? 'Modifier mon profil' : 'Créer mon profil';
   }
 
   get texteBouton(): string {
-    return this.profilExiste ? 'Modifier le profil' : 'Enregistrer mon profil';
+    return this.profilExiste ? 'Mettre à jour le profil' : 'Enregistrer mon profil';
   }
 
   get formulaireValide(): boolean {
     return this.prenom.trim().length > 0 && this.nom.trim().length > 0;
   }
 
+  // Formatage : 1ère lettre en majuscule, reste en minuscules pour chaque mot (ex: Jean-Marc, Fabrice)
+  formaterPrenom(valeur: string): string {
+    if (!valeur) return '';
+    return valeur
+      .toLowerCase()
+      .replace(/(?:^|[\s-])\S/g, (char) => char.toUpperCase());
+  }
+
+  // Événement déclenché à la saisie du prénom
+  surChangementPrenom(event: Event) {
+    const customEvent = event as CustomEvent;
+    const val = (customEvent?.detail?.value || (event.target as HTMLInputElement)?.value || '') as string;
+    this.prenom = this.formaterPrenom(val);
+  }
+
+  // Événement déclenché à la saisie du nom (tout en majuscules)
+  surChangementNom(event: Event) {
+    const customEvent = event as CustomEvent;
+    const val = (customEvent?.detail?.value || (event.target as HTMLInputElement)?.value || '') as string;
+    this.nom = (val || '').toUpperCase();
+  }
+
+  // Calcul des initiales pour l'avatar dynamique
+  get initiales(): string {
+    const pInit = this.prenom.trim() ? this.prenom.trim().charAt(0).toUpperCase() : '';
+    const nInit = this.nom.trim() ? this.nom.trim().charAt(0).toUpperCase() : '';
+    return (pInit + nInit) || '';
+  }
+
+  get nomComplet(): string {
+    const p = this.prenom.trim();
+    const n = this.nom.trim().toUpperCase();
+    if (p && n) return `${p} ${n}`;
+    if (p) return p;
+    if (n) return n;
+    return 'Votre Nom & Prénom';
+  }
+
   async enregistrer() {
     if (!this.formulaireValide) {
       const toast = await this.toastCtrl.create({
-        message: 'Veuillez saisir votre prénom et votre nom.',
+        message: 'Veuillez renseigner votre prénom et votre nom.',
         duration: 2000,
         color: 'warning',
         position: 'top'
@@ -87,18 +130,20 @@ export class CreerProfilPage implements OnInit {
       return;
     }
 
+    const prenomFinal = this.formaterPrenom(this.prenom.trim());
+    const nomFinal = this.nom.trim().toUpperCase();
+
     this.enregistrement = true;
     const loading = await this.loadingCtrl.create({
-      message: 'Enregistrement du profil...',
+      message: 'Enregistrement de votre profil...',
       spinner: 'crescent'
     });
     await loading.present();
 
     try {
-      // On utilise la nouvelle méthode sauvegarderProfil
       await this.profilSvc.sauvegarderProfil({
-        prenom: this.prenom,
-        nom: this.nom
+        prenom: prenomFinal,
+        nom: nomFinal
       });
 
       const toast = await this.toastCtrl.create({

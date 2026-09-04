@@ -1,64 +1,142 @@
 <ion-content [fullscreen]="true">
   <div class="page-wrap">
     
-    <!-- En-tête personnalisé -->
+    <!-- En-tête avec navigation et info utilisateur -->
     <div class="custom-header">
-      <ion-buttons>
-        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/populaire" text=""></ion-back-button>
       </ion-buttons>
-      <h1>Événements</h1>
-      <ion-button fill="clear" class="btn-add" (click)="allerCreer()">
-        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      <div class="header-titles">
+        <h1>Mes Matchs</h1>
+        <span class="user-sub" *ngIf="profil">
+          <ion-icon name="person-outline"></ion-icon>
+          {{ profil.prenom }} {{ profil.nom }}
+        </span>
+      </div>
+      <ion-button class="btn-create" (click)="allerCreer()">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Nouveau
       </ion-button>
     </div>
 
-    <!-- Liste avec scroll vertical -->
+    <!-- Barre de recherche -->
+    <div class="search-container" *ngIf="evenements.length > 0">
+      <ion-searchbar 
+        [(ngModel)]="recherche" 
+        placeholder="Rechercher une équipe ou une ligue..." 
+        [debounce]="150"
+        showClearButton="focus"
+        animated>
+      </ion-searchbar>
+    </div>
+
+    <!-- Filtres par championnat -->
+    <div class="filter-scroll" *ngIf="championnatsListe.length > 0 && evenements.length > 0">
+      <button 
+        type="button" 
+        class="filter-chip" 
+        [class.active]="filtreChampionnatId === 'tous'" 
+        (click)="setFiltreChampionnat('tous')">
+        Toutes ({{ evenements.length }})
+      </button>
+      <button 
+        type="button" 
+        class="filter-chip" 
+        *ngFor="let c of championnatsListe"
+        [class.active]="filtreChampionnatId === c.id" 
+        (click)="setFiltreChampionnat(c.id!)">
+        {{ c.nom }}
+      </button>
+    </div>
+
+    <!-- Liste des événements -->
     <div class="liste-evenements">
       
-      <div class="event-card" *ngFor="let ev of evenements">
+      <div class="event-card" *ngFor="let ev of evenementsFiltres">
         
-        <!-- En-tête de la carte -->
+        <!-- En-tête de la carte : Championnat + Date -->
         <div class="event-header">
-          <span class="championnat">{{ getNomChampionnat(ev.championnatId) }}</span>
-          <ion-badge color="medium">{{ ev.dateHeure }}</ion-badge>
+          <div class="champ-badge">
+            <ion-icon name="trophy-outline"></ion-icon>
+            <span>{{ getNomChampionnat(ev.championnatId) }}</span>
+          </div>
+          <span class="event-date">
+            <ion-icon name="time-outline"></ion-icon>
+            {{ ev.dateHeure | date:'dd MMM, HH:mm' }}
+          </span>
         </div>
 
-        <!-- Corps de la carte -->
+        <!-- Corps de la carte : Duel d'équipes -->
         <div class="event-body">
-          <div class="team">
-            <span>{{ getNomClub(ev.equipeADomicileId) }}</span>
-            <span class="vs">vs</span>
-            <span>{{ getNomClub(ev.equipeExterieurId) }}</span>
+          <div class="teams-container">
+            <!-- Équipe Domicile -->
+            <div class="team-col">
+              <div class="team-logo-wrap">
+                <img *ngIf="getLogoClub(ev.equipeADomicileId)" [src]="getLogoClub(ev.equipeADomicileId)" [alt]="getNomClub(ev.equipeADomicileId)" />
+                <ion-icon *ngIf="!getLogoClub(ev.equipeADomicileId)" name="shield-outline"></ion-icon>
+              </div>
+              <span class="team-title">{{ getNomClub(ev.equipeADomicileId) }}</span>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="vs-indicator">
+              <span>VS</span>
+            </div>
+
+            <!-- Équipe Extérieur -->
+            <div class="team-col">
+              <div class="team-logo-wrap">
+                <img *ngIf="getLogoClub(ev.equipeExterieurId)" [src]="getLogoClub(ev.equipeExterieurId)" [alt]="getNomClub(ev.equipeExterieurId)" />
+                <ion-icon *ngIf="!getLogoClub(ev.equipeExterieurId)" name="shield-outline"></ion-icon>
+              </div>
+              <span class="team-title">{{ getNomClub(ev.equipeExterieurId) }}</span>
+            </div>
           </div>
-          
-          <div class="bet-info">
-            <span class="option">
-              {{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }}
-            </span>
-            <span class="cote">Cote : {{ ev.cote }}</span>
+
+          <!-- Section du pari (Total + Cote) -->
+          <div class="bet-details-box">
+            <div class="bet-option">
+              <span class="bet-type-label">Marché : Total Buts</span>
+              <span class="bet-pick">
+                {{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }}
+              </span>
+            </div>
+            <div class="cote-badge">
+              <span class="cote-label">Cote</span>
+              <span class="cote-num">{{ ev.cote | number:'1.2-2' }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- Pied de carte : Actions -->
         <div class="event-actions">
-          <ion-button size="small" fill="clear" (click)="allerModifier(ev)">
+          <ion-button size="small" fill="clear" class="btn-action edit" (click)="allerModifier(ev)">
             <ion-icon slot="start" name="create-outline"></ion-icon>
             Modifier
           </ion-button>
-          <ion-button size="small" fill="clear" color="danger" (click)="supprimer(ev)">
+          <ion-button size="small" fill="clear" color="danger" class="btn-action" (click)="confirmerSuppression(ev)">
             <ion-icon slot="start" name="trash-outline"></ion-icon>
             Supprimer
           </ion-button>
         </div>
+
       </div>
 
-      <div class="liste-vide" *ngIf="evenements.length === 0">
-        <span>Aucun événement pour l'instant.</span>
-        <ion-button fill="outline" size="small" (click)="allerCreer()" style="margin-top: 16px;">
-          Créer le premier
+      <!-- État vide -->
+      <div class="liste-vide" *ngIf="evenementsFiltres.length === 0">
+        <div class="empty-icon-circle">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <h4 *ngIf="!recherche.trim()">Aucun match programmé</h4>
+        <h4 *ngIf="recherche.trim()">Aucun match ne correspond à votre recherche</h4>
+        <p *ngIf="!recherche.trim()">Créez vos rencontres sportives pour commencer à parier ou gérer vos cotes.</p>
+        <ion-button class="btn-empty-create" (click)="allerCreer()">
+          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+          Créer un nouveau match
         </ion-button>
       </div>
 
     </div>
+
   </div>
 </ion-content>

@@ -1,63 +1,133 @@
 <ion-content [fullscreen]="true">
   <div class="page-wrap">
     
-    <!-- En-tête personnalisé -->
+    <!-- En-tête avec navigation et info utilisateur -->
     <div class="custom-header">
-      <ion-buttons>
-        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/populaire" text=""></ion-back-button>
       </ion-buttons>
-      <h1>Championnats</h1>
+      <div class="header-titles">
+        <h1>Mes Championnats</h1>
+        <span class="user-sub" *ngIf="profil">
+          <ion-icon name="person-outline"></ion-icon>
+          {{ profil.prenom }} {{ profil.nom }}
+        </span>
+      </div>
+      <ion-badge color="primary" class="count-badge">
+        {{ championnats.length }} ligue{{ championnats.length > 1 ? 's' : '' }}
+      </ion-badge>
     </div>
 
-    <!-- Formulaire d'ajout -->
-    <div class="formulaire">
-      <ion-item>
-        <ion-input label="Nom du championnat" labelPlacement="stacked" [(ngModel)]="nom" placeholder="Ex. La Liga"></ion-input>
-      </ion-item>
-      <ion-button expand="block" [disabled]="enregistrement" (click)="ajouter()">Ajouter le championnat</ion-button>
+    <!-- Barre de recherche -->
+    <div class="search-container" *ngIf="championnats.length > 0">
+      <ion-searchbar 
+        [(ngModel)]="recherche" 
+        placeholder="Rechercher une ligue..." 
+        [debounce]="150"
+        showClearButton="focus"
+        animated>
+      </ion-searchbar>
     </div>
 
-    <!-- Liste avec scroll vertical -->
-    <div class="liste-championnats">
-      <div class="championnat" *ngFor="let c of championnats">
-        
-        <!-- Mode Affichage -->
-        <ng-container *ngIf="championnatEnEdition?.id !== c.id; else modeEdition">
-          <span class="nom-championnat">{{ c.nom }}</span>
-          
-          <div class="actions">
-            <ion-button fill="clear" size="small" (click)="demarrerEdition(c)">
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" color="danger" size="small" (click)="supprimer(c)">
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-button>
-          </div>
-        </ng-container>
-
-        <!-- Mode Édition -->
-        <ng-template #modeEdition>
-          <div class="edition-formulaire">
-            <ion-item>
-              <ion-input label="Nom" labelPlacement="stacked" [(ngModel)]="nomEdit"></ion-input>
-            </ion-item>
-            <div class="edition-actions">
-              <ion-button size="small" (click)="enregistrerEdition()">
-                <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-                Enregistrer
-              </ion-button>
-              <ion-button size="small" color="medium" fill="outline" (click)="annulerEdition()">
-                <ion-icon slot="start" name="close-outline"></ion-icon>
-                Annuler
-              </ion-button>
-            </div>
-          </div>
-        </ng-template>
-
+    <!-- Formulaire d'ajout dans une carte moderne -->
+    <div class="card-formulaire">
+      <div class="form-header">
+        <div class="icon-round">
+          <ion-icon name="trophy-outline"></ion-icon>
+        </div>
+        <div>
+          <h2>Ajouter un championnat</h2>
+          <p>Créez les ligues et compétitions pour vos matchs</p>
+        </div>
       </div>
 
-      <div class="liste-vide" *ngIf="championnats.length === 0">
-        <span>Aucun championnat pour l'instant.</span>
+      <div class="form-body">
+        <ion-item lines="none" class="input-item">
+          <ion-input 
+            label="Nom du championnat" 
+            labelPlacement="stacked" 
+            [(ngModel)]="nom" 
+            placeholder="Ex. Ligue des Champions UEFA">
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" class="btn-primary" [disabled]="enregistrement || !nom.trim()" (click)="ajouter()">
+          <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+          {{ enregistrement ? 'Enregistrement...' : 'Ajouter le championnat' }}
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Section Liste des championnats -->
+    <div class="section-liste">
+      <div class="section-title-row">
+        <h3>Championnats disponibles</h3>
+        <span class="result-count" *ngIf="recherche.trim()">
+          Résultat : {{ championnatsFiltres.length }}
+        </span>
+      </div>
+
+      <div class="liste-championnats">
+        <div class="champ-card" *ngFor="let c of championnatsFiltres">
+          
+          <!-- Mode Affichage -->
+          <ng-container *ngIf="championnatEnEdition?.id !== c.id; else modeEdition">
+            <div class="champ-info">
+              <div class="champ-icon-circle">
+                <ion-icon name="trophy-outline"></ion-icon>
+              </div>
+              <div class="champ-texts">
+                <span class="nom-championnat">{{ c.nom }}</span>
+                <span class="champ-meta">
+                  {{ evenementsParChampionnat[c.id || ''] || 0 }} match{{ (evenementsParChampionnat[c.id || ''] || 0) > 1 ? 's' : '' }} programmé{{ (evenementsParChampionnat[c.id || ''] || 0) > 1 ? 's' : '' }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="actions">
+              <ion-button fill="clear" size="small" class="btn-edit" (click)="demarrerEdition(c)">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" size="small" (click)="confirmerSuppression(c)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ng-container>
+
+          <!-- Mode Édition -->
+          <ng-template #modeEdition>
+            <div class="edition-formulaire">
+              <div class="edition-header">
+                <strong>Modifier la compétition</strong>
+              </div>
+              <ion-item lines="none" class="input-item">
+                <ion-input label="Nom" labelPlacement="stacked" [(ngModel)]="nomEdit"></ion-input>
+              </ion-item>
+              
+              <div class="edition-actions">
+                <ion-button size="small" class="btn-primary" (click)="enregistrerEdition()">
+                  <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+                  Sauvegarder
+                </ion-button>
+                <ion-button size="small" color="medium" fill="outline" (click)="annulerEdition()">
+                  <ion-icon slot="start" name="close-outline"></ion-icon>
+                  Annuler
+                </ion-button>
+              </div>
+            </div>
+          </ng-template>
+
+        </div>
+
+        <!-- État vide -->
+        <div class="liste-vide" *ngIf="championnatsFiltres.length === 0">
+          <div class="empty-icon-circle">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+          <h4 *ngIf="!recherche.trim()">Aucun championnat enregistré</h4>
+          <h4 *ngIf="recherche.trim()">Aucun championnat ne correspond à "{{ recherche }}"</h4>
+          <p *ngIf="!recherche.trim()">Créez vos ligues ci-dessus ou cliquez sur une suggestion rapide pour démarrer.</p>
+        </div>
       </div>
     </div>
 
