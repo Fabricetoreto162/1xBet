@@ -1,0 +1,11 @@
+<ion-content>
+  <div class="liste-raccourcis">
+    <app-carte-raccourci
+      *ngFor="let item of raccourcis"
+      [icone]="item.icone"
+      [titre]="item.titre"
+      [sousTitre]="item.sousTitre"
+      (clic)="aller(item.route)">
+    </app-carte-raccourci>
+  </div>
+</ion-content>

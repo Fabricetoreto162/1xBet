@@ -1,0 +1,62 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Créer un combiner</h1>
+      <ion-button fill="clear" (click)="allerVersListe()">
+        <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="liste-evenements">
+      <h2>Sélectionnez les événements</h2>
+      
+      <div class="event-item" *ngFor="let ev of evenements">
+        <ion-checkbox class="circle-check" (ionChange)="toggleEvenement(ev.id!, $event)"></ion-checkbox>
+        <div class="event-details">
+          <span class="teams">{{ getNomClub(ev.equipeADomicileId) }} vs {{ getNomClub(ev.equipeExterieurId) }}</span>
+          <span class="bet">{{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }} (Cote: {{ ev.cote }})</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre inférieure fixe -->
+    <div class="bottom-bar">
+      <div class="cote-info">
+        <span>Cote totale</span>
+        <strong>{{ coteTotal.toFixed(2) }}</strong>
+      </div>
+      <ion-button expand="block" [disabled]="selectedIds.size === 0" (click)="creerCombiner()">
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+        Générer le code
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- MODAL POUR LE CODE -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-box">
+    <ion-button class="close-btn" fill="clear" (click)="fermerModal()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+    <h2>Combiner Créé !</h2>
+    <p>Voici votre code à miser :</p>
+    <div class="code-display">
+      {{ codeGenere }}
+    </div>
+    <div class="modal-actions">
+      <ion-button expand="block" fill="outline" (click)="copierCode()">
+        <ion-icon slot="start" name="copy-outline"></ion-icon>
+        Copier le code
+      </ion-button>
+      <ion-button expand="block" (click)="allerAuCoupon()">
+        Aller miser
+      </ion-button>
+    </div>
+  </div>
+</div>

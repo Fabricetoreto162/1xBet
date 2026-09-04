@@ -1,0 +1,139 @@
+<!-- Bloc de chargement -->
+<div class="conteneur-chargement" *ngIf="chargementEnCours">
+  <ion-spinner name="circular"></ion-spinner>
+</div>
+
+
+
+
+
+
+
+<ion-header class="entete-menu">
+  <ion-toolbar>
+    <div class="bandeau-profil">
+      <button class="profil" (click)="ouvrirProfil()">
+        <span class="avatar">
+          <img src="assets/icons/user-profil-icon.png" alt="Profil" />
+        </span>
+        <span class="infos-profil">
+          <strong>{{ nomComplet }}</strong>
+          <span class="sous-texte">Modifier le profil</span>
+        </span>
+      </button>
+
+      <div class="icones-profil">
+        <button class="btn-icone" (click)="ouvrirMessages()">
+          <img src="assets/icons/message-icon.png" alt="Messages" />
+        </button>
+        <button class="btn-icone" (click)="ouvrirParametres()">
+          <img src="assets/icons/settings-top-r.png" alt="Paramètres" />
+          
+        </button>
+      </div>
+    </div>
+
+    <div class="ligne-solde">
+      <button class="pilule-solde">
+        <img src="assets/icons/wallet-refresh-icon.png" alt="Solde" />
+        <span>{{ texteSolde }} ₣</span>
+        <ion-icon name="chevron-down-outline" class="chevron"></ion-icon>
+      </button>
+
+      <button class="btn-depot" (click)="deposer()">
+        <ion-icon name="add"></ion-icon>
+        <span>Effectuer un dépôt</span>
+      </button>
+    </div>
+
+    <div class="onglets-categories">
+      <button class="onglet" [class.actif]="ongletActif === 'populaires'" (click)="choisirOnglet('populaires')">
+        <img src="assets/icons/populaire-top-r.png" alt="Populaires" />
+        <span>Populaires</span>
+      </button>
+      <button class="onglet" [class.actif]="ongletActif === 'sports'" (click)="choisirOnglet('sports')">
+        <img src="assets/icons/sport-top-r.png" alt="Sports" />
+        <span>Sports</span>
+      </button>
+      <button class="onglet" [class.actif]="ongletActif === 'casino'" (click)="choisirOnglet('casino')">
+        <img src="assets/icons/casino-top-r.png" alt="Casino" />
+        <span>Casino</span>
+      </button>
+      <button class="onglet" [class.actif]="ongletActif === '1xgames'" (click)="choisirOnglet('1xgames')">
+        <img src="assets/icons/1xgames-r.png" alt="1xGames" />
+        <span>1xGames</span>
+      </button>
+      <button class="onglet" [class.actif]="ongletActif === 'autre'" (click)="choisirOnglet('autre')">
+        <img src="assets/icons/autre-r.png" alt="Autre" />
+        <span>Autre</span>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true"  *ngIf="!chargementEnCours">
+  <div class="menu-page">
+    <div class="liste-categories">
+      <button class="carte-categorie" (click)="ouvrirCategorie('libertadores')">
+        <span class="icone-image">
+          <img src="assets/icons/Libertadores-r.png" alt="Libertadores" />
+        </span>
+        <span class="titre">Libertadores</span>
+      </button>
+
+      <button class="carte-categorie" (click)="ouvrirCategorie('mlb')">
+        <span class="icone-image">
+          <img src="assets/icons/MLB-r.png" alt="MLB" />
+        </span>
+        <span class="titre">MLB</span>
+      </button>
+
+      <button class="carte-categorie" (click)="ouvrirCategorie('kbo')">
+        <span class="icone-image">
+          <img src="assets/icons/KBO-r.png" alt="KBO" />
+        </span>
+        <span class="titre">KBO</span>
+      </button>
+
+      <button class="carte-categorie avec-description" (click)="ouvrirCategorie('en-direct')">
+        <span class="icone-image icone-neutre">
+          <img src="assets/icons/en-direct-r.png" alt="En direct" />
+        </span>
+        <span class="colonne-texte">
+          <span class="titre">EN DIRECT</span>
+          <span class="sous-titre">Pariez sur les événements en direct</span>
+        </span>
+      </button>
+
+      <button class="carte-categorie avec-description" (click)="ouvrirCategorie('avant-match')">
+        <span class="icone-image icone-neutre">
+          <img src="assets/icons/avant-match-r.png" alt="Avant-match" />
+        </span>
+        <span class="colonne-texte">
+          <span class="titre">Avant-match</span>
+          <span class="sous-titre">Pariez sur les événements à venir</span>
+        </span>
+      </button>
+
+      <button class="carte-categorie avec-description" (click)="ouvrirCategorie('esport')">
+        <span class="icone-image icone-neutre">
+          <img src="assets/icons/e-sport-r.png" alt="E-sport" />
+        </span>
+        <span class="colonne-texte">
+          <span class="titre">E-sport</span>
+          <span class="sous-titre">Les meilleurs événements d'e-sport</span>
+        </span>
+      </button>
+
+      <button class="carte-categorie avec-description" (click)="ouvrirCategorie('machines-a-sous')">
+        <span class="icone-image icone-neutre">
+          <img src="assets/icons/marchine-a-sous-r.png" alt="Machines à sous" />
+        </span>
+        <span class="colonne-texte">
+          <span class="titre">Machines à sous</span>
+          <span class="sous-titre">Les meilleures machines à sous</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</ion-content>

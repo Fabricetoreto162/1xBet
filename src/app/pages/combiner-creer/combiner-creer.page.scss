@@ -1,0 +1,124 @@
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.custom-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px 0 16px;
+  flex-shrink: 0;
+  h1 { margin: 0; font-size: 24px; font-weight: 700; color: var(--app-text); flex: 1; }
+}
+
+.liste-evenements {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 120px; // Espace pour la barre du bas
+
+  h2 { font-size: 16px; color: var(--app-text-secondary); margin-bottom: 12px; }
+  
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--app-surface);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: var(--app-surface-shadow);
+
+    // Rendre la checkbox circulaire
+    ion-checkbox.circle-check {
+      --size: 24px;
+      --border-radius: 50%;
+      --border-width: 2px;
+      --border-color: var(--app-text-secondary);
+      --checkbox-background-checked: var(--app-success);
+      --border-color-checked: var(--app-success);
+      --checkmark-color: var(--app-background); // Couleur du "V" à l'intérieur
+    }
+
+    .event-details {
+      display: flex;
+      flex-direction: column;
+      .teams { font-size: 14px; font-weight: 700; color: var(--app-text); }
+      .bet { font-size: 12px; color: var(--app-text-secondary); margin-top: 2px; }
+    }
+  }
+}
+
+// Barre flottante en bas
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(to top, var(--app-background) 80%, transparent);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .cote-info {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    span { font-size: 12px; color: var(--app-text-secondary); }
+    strong { font-size: 18px; color: var(--app-success); }
+  }
+  ion-button { flex: 1; margin: 0; }
+}
+
+// Styles du Modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal-box {
+  background: var(--app-surface);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 350px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    --color: var(--app-text-secondary);
+  }
+  h2 { margin: 0 0 8px; color: var(--app-text); }
+  p { color: var(--app-text-secondary); font-size: 13px; margin-bottom: 16px; }
+
+  .code-display {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: var(--app-success);
+    background: rgba(255,255,255,0.05);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px dashed var(--app-success);
+  }
+  .modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

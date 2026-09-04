@@ -1,0 +1,131 @@
+<!-- Bloc de chargement -->
+<div class="conteneur-chargement" *ngIf="chargementEnCours">
+  <ion-spinner name="circular"></ion-spinner>
+</div>
+
+
+
+
+
+
+
+<ion-content *ngIf="!chargementEnCours">
+  <!-- Header Coupon -->
+  <div class="coupon-header">
+    <h1>Coupon</h1>
+  </div>
+
+<div class="coupon-page">
+
+
+<div class="message-vide">
+  <strong>Votre coupon de pari est vide</strong>
+  <span>
+    Ajoutez un événement au coupon de pari ou sélectionnez l'une des options
+  </span>
+</div>
+
+<!-- Recharger le compte -->
+<button class="option" (click)="aller('/solde')">
+  <div class="icone-rond fond-vert">
+    <ion-icon name="add-outline"></ion-icon>
+  </div>
+
+ 
+<div class="textes">
+  <strong>Recharger le compte</strong>
+  <span>Votre solde : {{ texteSolde }} ₣</span>
+</div>
+</button>
+
+<!-- Recherche d'événement -->
+<button class="option" (click)="aller('/evenements/recherche')">
+  <div class="icone-rond">
+    <img
+      src="assets/icons/search-icon.png"
+      alt="Recherche d'événement"
+    />
+  </div>
+
+  <div class="textes">
+    <strong>Recherche d'événement</strong>
+    <span>Uniquement pour vous</span>
+  </div>
+</button>
+
+<!-- Pari combiné du jour -->
+<button class="option" (click)="aller('/coupon/combine-du-jour')">
+  <div class="icone-rond">
+    <img
+      src="assets/icons/combine-icon.png"
+      alt="Pari combiné du jour"
+    />
+  </div>
+
+  <div class="textes">
+    <strong>Pari combiné du jour</strong>
+    <span>Meilleures offres du jour</span>
+  </div>
+</button>
+
+<!-- Créer coupon -->
+<button class="option" (click)="aller('/coupon/creer')">
+  <div class="icone-rond">
+    <img
+      src="assets/icons/creer-coupon.png"
+      alt="Créer coupon de pari"
+    />
+  </div>
+
+  <div class="textes">
+    <strong>Créer coupon de pari</strong>
+    <span>Générez votre coupon de pari</span>
+  </div>
+</button>
+
+<!-- Charger coupon -->
+<button class="option" (click)="ouvrirModalCharger()">
+  <div class="icone-rond">
+    <img
+      src="assets/icons/charger-icon.png"
+      alt="Charger le coupon de pari"
+    />
+  </div>
+
+  <div class="textes">
+    <strong>Charger le coupon de pari</strong>
+    <span>Chargez votre coupon de pari</span>
+  </div>
+</button>
+
+
+  </div>
+</ion-content>
+
+<ion-modal
+  [isOpen]="modalChargerOuvert"
+  [initialBreakpoint]="0.4"
+  [breakpoints]="[0, 0.4]"
+  (didDismiss)="fermerModalCharger()"
+>
+  <ng-template>
+    <div class="modal-charger">
+      <h2>Charger le coupon de pari</h2>
+      <p>Saisissez le code du coupon de pari</p>
+      <input
+        type="text"
+        class="champ-code"
+        [(ngModel)]="codeSaisi"
+        name="codeSaisi"
+        autocapitalize="characters"
+      />
+      <button
+        class="btn-telecharger"
+        [disabled]="chargementEnCours"
+        (click)="telecharger()"
+      >
+        Télécharger
+      </button>
+    </div>
+  </ng-template>
+</ion-modal>

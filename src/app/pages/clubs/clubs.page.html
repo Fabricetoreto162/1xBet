@@ -1,0 +1,92 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Clubs</h1>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="formulaire">
+      <ion-item>
+        <ion-input label="Nom du club" labelPlacement="stacked" [(ngModel)]="nom" placeholder="Ex. Paris Saint-Germain"></ion-input>
+      </ion-item>
+      
+      <!-- Zone d'upload de logo -->
+      <div class="upload-zone">
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput hidden>
+        <ion-button expand="block" fill="outline" (click)="fileInput.click()">
+          <ion-icon slot="start" name="camera-outline"></ion-icon>
+          {{ previewUrl ? 'Changer le logo' : 'Choisir un logo' }}
+        </ion-button>
+        <div class="preview" *ngIf="previewUrl">
+          <img [src]="previewUrl" alt="Aperçu" />
+        </div>
+      </div>
+
+      <ion-button expand="block" [disabled]="enregistrement" (click)="ajouter()">Ajouter le club</ion-button>
+    </div>
+
+    <!-- Liste des clubs -->
+    <div class="liste-clubs">
+      <div class="club" *ngFor="let club of clubs">
+        
+        <!-- Mode Affichage -->
+        <ng-container *ngIf="clubEnEdition?.id !== club.id; else modeEdition">
+          <ion-avatar><img [src]="club.logoUrl" [alt]="club.nom" /></ion-avatar>
+          <span class="nom-club">{{ club.nom }}</span>
+          
+          <div class="actions">
+            <ion-button fill="clear" size="small" (click)="demarrerEdition(club)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" size="small" (click)="supprimer(club)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ng-container>
+
+        <!-- Mode Édition -->
+        <ng-template #modeEdition>
+          <div class="edition-formulaire">
+            <ion-item>
+              <ion-input label="Nom" labelPlacement="stacked" [(ngModel)]="nomEdit"></ion-input>
+            </ion-item>
+            
+            <div class="upload-zone edit-zone">
+              <input type="file" accept="image/*" (change)="onFileSelectedEdit($event)" #fileInputEdit hidden>
+              <div class="edit-preview-actions">
+                <div class="preview small" *ngIf="previewUrlEdit">
+                  <img [src]="previewUrlEdit" alt="Aperçu" />
+                </div>
+                <ion-button size="small" fill="outline" (click)="fileInputEdit.click()">
+                  <ion-icon slot="start" name="camera-outline"></ion-icon>
+                  Nouveau logo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="edition-actions">
+              <ion-button size="small" (click)="enregistrerEdition()">
+                <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+                Enregistrer
+              </ion-button>
+              <ion-button size="small" color="medium" fill="outline" (click)="annulerEdition()">
+                <ion-icon slot="start" name="close-outline"></ion-icon>
+                Annuler
+              </ion-button>
+            </div>
+          </div>
+        </ng-template>
+
+      </div>
+
+      <div class="liste-vide" *ngIf="clubs.length === 0">
+        <span>Aucun club pour l'instant.</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

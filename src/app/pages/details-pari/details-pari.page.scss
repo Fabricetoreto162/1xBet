@@ -1,0 +1,239 @@
+
+/* Style du Spinner de chargement */
+.conteneur-chargement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Centre verticalement sur l'écran */
+  width: 100%;
+}
+
+ion-spinner {
+  --color: #4184C8; /* La couleur bleue que tu as choisie */
+  width: 45px;      /* Taille normale, ni trop petite ni trop grande */
+  height: 45px;
+}
+
+
+
+
+
+
+// ── Header fixe (ne scroll pas) ──
+.entete-header {
+  ion-toolbar {
+    --background: var(--app-background, #fff);
+    --border-width: 0;
+    padding: 0 16px;
+  }
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+
+  .btn-icone {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+
+    ion-icon { font-size: 22px; color: var(--app-text-secondary); }
+  }
+
+  h1 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--app-text-secondary);
+    margin: 0;
+  }
+}
+
+// ── Contenu scrollable ──
+.details-page {
+  padding: 8px 16px 24px; /* Un peu d'espace en haut, sur les côtés, et en bas */
+}
+
+.carte-resume,
+.carte-evenement {
+  background: var(--app-surface);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 2px; /* Espace entre les cartes */
+  box-shadow: var(--app-surface-shadow);
+}
+
+.numero-coupon {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: var(--app-surface);
+  border-radius: 10px;
+  padding: 16px;
+  padding-bottom: 25px !important;
+  margin-bottom: 2px;
+  box-shadow: var(--app-surface-shadow);
+
+  .date-mise {
+    font-size: 11.5px;
+    color: var(--app-text-secondary);
+  }
+
+  strong {
+    font-size: 12.5px;
+    letter-spacing: 0.3px;
+    color: var(--app-text);
+    font-weight: 700;
+  }
+}
+
+.ligne-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--app-text-secondary);
+  padding: 5px 0;
+
+  strong { color: var(--app-text); font-weight: 700; }
+
+  .avec-icone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--app-text);
+
+    .icone-combine {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+  }
+
+  .termines { font-size: 12px; color: var(--app-text-secondary); }
+}
+
+.statut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--app-primary); /* Couleur par défaut */
+  white-space: nowrap;
+
+  ion-icon { font-size: 16px; border-radius: 50%; }
+
+  /* Accepté / En attente */
+  &.accepte, &.en-attente {
+    color: var(--app-primary);
+    ion-icon { color: var(--app-primary); }
+  }
+
+  /* Gagné / Payé */
+  &.gagne, &.paye {
+    color: var(--app-success);
+    ion-icon { color: var(--app-success); }
+  }
+
+  /* Perdu */
+  &.perdu {
+    color: var(--app-danger);
+    ion-icon { color: var(--app-danger); }
+  }
+}
+
+.ligne-sport {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--app-text);
+  margin-bottom: 2px; /* Rapproche un peu la date */
+
+  .icone-sport {
+    width: 18px;
+    height: 18px;
+    margin-top: 10px;
+    object-fit: contain;
+  }
+}
+
+.ligne-date {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+
+  .date { 
+    font-size: 11.5px; 
+    color: var(--app-text-secondary);
+    padding-left: 22px; /* Décale la date pour qu'elle commence sous le texte, pas sous l'icône */
+  }
+}
+.ligne-equipes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  .equipe {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+
+    img { width: 35px; height: 35px; object-fit: contain; }
+    span { font-size: 12px; font-weight: 700; color: var(--app-text); text-align: center; }
+  }
+
+  .score {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--app-text);
+    padding: 0 12px;
+
+    &.en-attente { 
+      color: var(--app-text-secondary); 
+      font-weight: 700;
+      font-size: 18px;
+    }
+  }
+}
+
+.btn-dupliquer {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 8px;
+  background: var(--app-primary-light, #b0d7f7);
+  color: var(--app-primary);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+// ── Cacher la scrollbar tout en gardant le scroll natif d'Ionic ──
+ion-content::part(scroll) {
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

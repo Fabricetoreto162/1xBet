@@ -1,0 +1,42 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom" [class.clavier-actif]="clavierOuvert">
+
+    <ion-tab-button tab="populaire">
+      <ion-icon name="flame"></ion-icon>
+      <ion-label>Populaire</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="favoris">
+      <ion-icon name="star"></ion-icon>
+      <ion-label>Favoris</ion-label>
+    </ion-tab-button>
+
+    <!-- Espace réservé au bouton Coupon -->
+    <div class="coupon-space"></div>
+
+    <ion-tab-button tab="historique">
+      <ion-icon name="time"></ion-icon>
+      <ion-label>Historique</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="menu">
+      <ion-icon name="grid"></ion-icon>
+      <ion-label>Menu</ion-label>
+    </ion-tab-button>
+
+   
+
+  </ion-tab-bar>
+   <!-- LE BOUTON EST ICI, À L'INTÉRIEUR DE LA TAB BAR -->
+    <div
+      class="coupon-floating"
+      routerLink="/tabs/coupon"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <div class="coupon-fab">
+        <ion-icon name="ticket"></ion-icon>
+      </div>
+      <span>Coupon</span>
+    </div>
+</ion-tabs>

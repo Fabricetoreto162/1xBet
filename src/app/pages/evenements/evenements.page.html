@@ -1,0 +1,64 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête personnalisé -->
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Événements</h1>
+      <ion-button fill="clear" class="btn-add" (click)="allerCreer()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Liste avec scroll vertical -->
+    <div class="liste-evenements">
+      
+      <div class="event-card" *ngFor="let ev of evenements">
+        
+        <!-- En-tête de la carte -->
+        <div class="event-header">
+          <span class="championnat">{{ getNomChampionnat(ev.championnatId) }}</span>
+          <ion-badge color="medium">{{ ev.dateHeure }}</ion-badge>
+        </div>
+
+        <!-- Corps de la carte -->
+        <div class="event-body">
+          <div class="team">
+            <span>{{ getNomClub(ev.equipeADomicileId) }}</span>
+            <span class="vs">vs</span>
+            <span>{{ getNomClub(ev.equipeExterieurId) }}</span>
+          </div>
+          
+          <div class="bet-info">
+            <span class="option">
+              {{ ev.sens === 'plus' ? 'Plus de' : 'Moins de' }} {{ ev.seuilTotal }}
+            </span>
+            <span class="cote">Cote : {{ ev.cote }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="event-actions">
+          <ion-button size="small" fill="clear" (click)="allerModifier(ev)">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Modifier
+          </ion-button>
+          <ion-button size="small" fill="clear" color="danger" (click)="supprimer(ev)">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Supprimer
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="liste-vide" *ngIf="evenements.length === 0">
+        <span>Aucun événement pour l'instant.</span>
+        <ion-button fill="outline" size="small" (click)="allerCreer()" style="margin-top: 16px;">
+          Créer le premier
+        </ion-button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

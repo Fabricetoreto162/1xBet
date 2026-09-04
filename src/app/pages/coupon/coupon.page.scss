@@ -1,0 +1,240 @@
+/* Style du Spinner de chargement */
+.conteneur-chargement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Centre verticalement sur l'écran */
+  width: 100%;
+}
+
+ion-spinner {
+  --color: #4184C8; /* La couleur bleue que tu as choisie */
+  width: 45px;      /* Taille normale, ni trop petite ni trop grande */
+  height: 45px;
+}
+
+
+
+
+
+
+
+
+.coupon-page {
+padding: 0 16px 16px;
+margin-top: 20px !important;
+}
+
+.titre-page {
+text-align: center;
+font-size: 20px;
+font-weight: 800;
+color: var(--app-text-secondary);
+padding: 18px 0;
+margin: 0;
+}
+
+.message-vide {
+text-align: center;
+margin-bottom: 20px;
+
+strong {
+display: block;
+font-size: 15px;
+color: var(--app-text);
+margin-bottom: 6px;
+}
+
+span {
+font-size: 13px;
+color: var(--app-text-secondary);
+line-height: 1.4;
+}
+}
+
+.option {
+display: flex;
+align-items: center;
+gap: 14px;
+width: 100%;
+background: var(--app-surface);
+border: none;
+border-radius: 16px;
+padding: 16px;
+margin-bottom: 12px;
+box-shadow: var(--app-surface-shadow);
+text-align: left;
+cursor: pointer;
+transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+&:active {
+transform: scale(0.98);
+}
+}
+
+.icone-rond {
+width: 45px;
+height: 45px;
+min-width: 45px;
+border-radius: 50%;
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+background: #eaf2fb;
+flex-shrink: 0;
+overflow: hidden;
+
+/* Icônes Ionic */
+ion-icon {
+font-size: 30px;
+color: var(--app-primary);
+}
+
+/* Images PNG */
+img {
+width: 30px;
+height: 30px;
+object-fit: contain;
+display: block;
+}
+
+/* Recharger le compte */
+&.fond-vert {
+background: var(--app-recharge);
+
+
+ion-icon {
+  color: #fff;
+  font-size: 22px;
+}
+
+
+}
+}
+
+.textes {
+min-width: 0;
+
+strong {
+display: block;
+font-size: 15px;
+color: var(--app-text);
+font-weight: 700;
+}
+
+span {
+display: block;
+font-size: 12.5px;
+color: var(--app-text-secondary);
+margin-top: 2px;
+line-height: 1.35;
+}
+}
+
+
+.coupon-header {
+width: 100%;
+background: var(--app-tab-bar-bg);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 18px 16px;
+box-sizing: border-box;
+
+h1 {
+margin: 0;
+font-size: 20px;
+font-weight: 800;
+color: var(--app-text-secondary);
+}
+}
+
+/* Modal "Charger le coupon de pari" */
+.modal-charger {
+padding: 20px 20px;
+
+
+h2 {
+text-align: center;
+font-size: 19px;
+font-weight: 800;
+color: var(--menu-text);
+margin: 4px 0 18px;
+}
+
+p {
+font-size: 13px;
+color: var(--menu-icon);
+margin: 0 0 8px;
+}
+
+.champ-code {
+width: 100%;
+border: none;
+border-bottom: 1px solid var(--app-primary);
+background: transparent;
+font-size: 16px;
+color: var(--app-text);
+padding: 6px 2px;
+margin-bottom: 26px;
+font-family: inherit;
+box-sizing: border-box;
+
+&:focus {
+  outline: none;
+}
+}
+
+.btn-telecharger {
+width: 100%;
+background: var(--menu-icon);
+color: #fff;
+border: none;
+border-radius: 12px;
+padding: 14px 0 ;
+font-size: 15px;
+font-weight: 700;
+
+
+&:disabled {
+  opacity: 0.6;
+}
+}
+}
+
+
+
+ion-modal {
+  --border-radius: 20px;
+     --height: 550px;
+  position: absolute;
+  left: 0;
+  right: 0; 
+  
+ 
+
+
+  
+}
+
+
+ion-modal .ion-page{
+  position: relative !important;
+  bottom: auto !important;
+  height: auto !important;
+}
+
+
+
+
+
+::ng-deep .ion-page:has(.modal-charger) {
+  padding-bottom: 0;
+}
+
+
+::ng-deep .ion-page {
+  padding-bottom: 0;
+}

@@ -1,0 +1,57 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête personnalisé -->
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>{{ titrePage }}</h1>
+    </div>
+
+    <!-- Carte info aperçu -->
+    <div class="carte-apercu">
+      <div class="avatar-cercle">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+      <div class="apercu-infos">
+        <span class="libelle">Aperçu du profil</span>
+        <strong class="nom-affiche">
+          {{ prenom || nom ? (prenom + ' ' + nom) : 'Prénom & Nom' }}
+        </strong>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="formulaire">
+      <ion-item>
+        <ion-input 
+          label="Prénom" 
+          labelPlacement="stacked" 
+          type="text" 
+          [(ngModel)]="prenom" 
+          placeholder="Ex. Fabrice">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input 
+          label="Nom" 
+          labelPlacement="stacked" 
+          type="text" 
+          [(ngModel)]="nom" 
+          placeholder="Ex. TOWANOU">
+        </ion-input>
+      </ion-item>
+      
+      <ion-button 
+        expand="block" 
+        [disabled]="enregistrement || !formulaireValide" 
+        (click)="enregistrer()">
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+        {{ texteBouton }}
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

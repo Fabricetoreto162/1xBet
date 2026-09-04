@@ -1,0 +1,243 @@
+/* Style du Spinner de chargement */
+.conteneur-chargement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Centre verticalement sur l'écran */
+  width: 100%;
+}
+
+ion-spinner {
+  --color: #4184C8; /* La couleur bleue que tu as choisie */
+  width: 45px;      /* Taille normale, ni trop petite ni trop grande */
+  height: 45px;
+}
+
+
+
+
+// ── Configuration de la Toolbar ──
+ion-toolbar {
+  --background: var(--app-background, #ffffff);
+  --min-height: auto; // Laisse la hauteur s'adapter au contenu
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  padding-top: var(--ion-safe-area-top, 0); // Gère la barre de statut iOS
+}
+
+.historique-header {
+  padding: 0 16px;
+}
+
+// ── Header centré ──
+.entete {
+  position: relative;
+  text-align: center;
+  padding: 16px 0 4px;
+
+  h1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--app-text-secondary);
+    margin: 0;
+
+    .chevron-titre { font-size: 18px; color: var(--app-text-secondary); }
+  }
+
+  .icone-releve {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img { width: 35px; height: 35px; object-fit: contain; }
+  }
+}
+
+// ── Compte principal centré ──
+.compte-principal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 20px;
+
+  .libelle {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--app-text-secondary);
+  }
+
+  .montant-ligne {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    margin-top: 4px;
+
+    .montant { font-size: 25px; font-weight: 600; color: var(--app-text); }
+    ion-icon { font-size: 18px; color: var(--app-text); }
+  }
+}
+
+// ── 3 cartes égales ──
+.actions-rapides {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+
+  .action {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: none;
+    border-radius: 16px;
+    padding: 5px 8px;
+    background: var(--app-surface-muted, #ced0d1);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--menu-icon);
+    text-align: start;
+    line-height: 1.2;
+
+    .icone-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img { width: 30px; height: 30px; object-fit: contain; }
+    }
+  }
+
+  .action-depot {
+    background: var(--app-success-light, #b9ebc7);
+    color: var(--app-success);
+  }
+}
+
+.separateur-section {
+  height: 1px;
+  background: var(--app-border, rgba(0,0,0,0.08));
+  margin-bottom: 0;
+}
+
+// ── Liste de paris (dans ion-content) ──
+.liste-paris {
+  padding: 16px;
+}
+
+.liste-vide {
+  text-align: center;
+  padding: 40px 20px;
+  span { font-size: 13px; color: var(--app-text-secondary); }
+}
+
+.carte-pari {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--app-surface);
+  border: none;
+  border-radius: 16px;
+  padding: 25px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--app-surface-shadow);
+
+  .ligne-haut {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    .date { font-size: 11.5px; color: var(--app-text-secondary); }
+        .icones-carte {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      
+      ion-icon { font-size: 16px; color: var(--menu-icon); }
+      
+      /* AJOUTE CECI pour dimensionner ton image */
+      img.icone-notification {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .ligne-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--app-text-secondary);
+    padding: 6px 0;
+
+    strong { color: var(--app-text); font-weight: 700; }
+    .gain-positif { color: var(--app-success); }
+  }
+
+  .ligne-finale {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+
+    .info-finale {
+      font-size: 13px;
+      color: var(--app-text-secondary);
+
+      strong {
+        color: var(--app-text);
+        font-weight: 700;
+        &.gain-positif { color: var(--app-success); }
+      }
+    }
+  }
+
+   .statut {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--app-primary); /* Couleur par défaut (Accepté) */
+    white-space: nowrap;
+
+    ion-icon { font-size: 16px; border-radius: 50%; }
+
+    /* Accepté */
+    &.accepte { 
+      color: var(--app-primary); 
+      ion-icon { color: var(--app-primary); }
+    }
+
+    /* Gagné / Payé */
+    &.gagne, &.paye { 
+      color: var(--app-success); 
+      ion-icon { color: var(--app-success); }
+    }
+
+    /* Perdu */
+    &.perdu { 
+      color: var(--app-danger); 
+      ion-icon { color: var(--app-danger); }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+<!-- Bloc de chargement -->
+<div class="conteneur-chargement" *ngIf="chargementEnCours">
+  <ion-spinner name="circular"></ion-spinner>
+</div>
+
+
+
+
+
+<ion-header class="ion-no-border" *ngIf="!chargementEnCours">
+  <ion-toolbar>
+    <div class="historique-header">
+      <div class="entete">
+        <button class="icone-releve" (click)="ouvrirReleve()">
+          <img src="assets/icons/en-haut-a-droit.png" alt="Relevé" />
+        </button>
+        <h1>
+          Historique des paris
+          <ion-icon name="chevron-down-outline" class="chevron-titre"></ion-icon>
+        </h1>
+      </div>
+
+      <div class="compte-principal">
+        <span class="libelle">Compte principal</span>
+        <button class="montant-ligne">
+          <strong class="montant">{{ texteSolde }} ₣</strong>
+          <ion-icon name="chevron-down-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="actions-rapides">
+        <button class="action action-depot" (click)="deposer()">
+          <span class="icone-wrapper">
+            <img src="assets/icons/effectuer-un-depot.png" alt="Effectuer un dépôt" />
+          </span>
+          <span>Effectuer un dépôt</span>
+        </button>
+
+        <button class="action" (click)="ouvrirVente()">
+          <span class="icone-wrapper">
+            <img src="assets/icons/vente.png" alt="Vente" />
+          </span>
+          <span>Vente</span>
+        </button>
+
+        <button class="action" (click)="ouvrirFiltres()">
+          <span class="icone-wrapper">
+            <img src="assets/icons/filtres.png" alt="Filtres" />
+          </span>
+          <span>Filtres</span>
+        </button>
+      </div>
+
+      <div class="separateur-section"></div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="liste-paris">
+    <div class="liste-vide" *ngIf="paris.length === 0">
+      <span>Aucun pari pour l'instant — les paris que tu places apparaîtront ici.</span>
+    </div>
+
+    <button class="carte-pari" *ngFor="let p of paris" (click)="ouvrir(p.id!)">
+      <div class="ligne-haut">
+        <span class="date">{{ p.dateCreation | date:'dd.MM.yyyy (HH:mm)' }}</span>
+        <div class="icones-carte">
+  <img *ngIf="p.statut === 'accepte'" src="assets/icons/notifications-outline.png" alt="Notification" class="icone-notification" />
+          <ion-icon name="ellipsis-vertical" (click)="ouvrirMenu($event, p)"></ion-icon>
+        </div>
+      </div>
+
+      <div class="ligne-detail">
+        <span>Combiné</span>
+        <strong>{{ p.coteCombinee | number:'1.0-2' }}</strong>
+      </div>
+
+      <div class="ligne-detail">
+        <span>Mise :</span>
+        <strong>{{ formatterNombre(p.mise) }} ₣</strong>
+      </div>
+
+      <div class="ligne-finale" *ngIf="p.statut === 'accepte'">
+        <span class="info-finale">
+          Gains potentiels : <strong>{{ formatterNombre(p.mise * p.coteCombinee) }} ₣</strong>
+        </span>
+        <span class="statut" [ngClass]="p.statut">
+          <ion-icon [name]="iconeStatut(p)"></ion-icon>
+          {{ libelleStatut(p) }}
+        </span>
+      </div>
+
+            <div class="ligne-finale" *ngIf="p.statut !== 'accepte'">
+        <span class="info-finale">
+          Gains : 
+          <!-- On n'affiche le montant QUE si ce n'est pas perdu -->
+          <strong *ngIf="p.statut !== 'perdu'" [class.gain-positif]="p.statut === 'gagne'">{{ formatterNombre(p.gains) }} ₣</strong>
+        </span>
+        <span class="statut" [ngClass]="p.statut">
+          <ion-icon [name]="iconeStatut(p)"></ion-icon>
+          {{ libelleStatut(p) }}
+        </span>
+      </div>
+
+
+
+
+
+    </button>
+  </div>
+</ion-content>

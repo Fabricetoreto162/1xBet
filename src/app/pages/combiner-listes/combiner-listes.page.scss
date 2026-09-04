@@ -1,0 +1,121 @@
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.custom-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px 0 16px;
+  flex-shrink: 0;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--app-text);
+    flex: 1;
+  }
+
+  .btn-add {
+    --color: var(--app-text);
+    font-size: 24px;
+  }
+}
+
+// Liste prenant l'espace restant avec scroll
+.liste-combiners { 
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px; 
+}
+
+.combiner-card {
+  display: flex;
+  align-items: stretch;
+  background: var(--app-surface);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--app-surface-shadow);
+  overflow: hidden;
+
+  .card-left {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .ticket-icon {
+      font-size: 28px;
+      color: var(--app-success);
+    }
+  }
+
+  .card-content {
+    flex: 1;
+    padding: 12px 12px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .code-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .code-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--app-text);
+    }
+
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      margin: 0;
+      --color: var(--app-text-secondary);
+    }
+  }
+
+  .stats-section {
+    display: flex;
+    gap: 24px;
+    margin: 10px 0;
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      
+      .label { font-size: 11px; color: var(--app-text-secondary); }
+      strong { font-size: 15px; color: var(--app-text); margin-top: 2px; }
+      .success { color: var(--app-success); }
+    }
+  }
+
+  .date-section {
+    span { font-size: 11px; color: var(--app-text-secondary); }
+  }
+}
+
+.liste-vide {
+  text-align: center;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .empty-icon {
+    font-size: 48px;
+    color: var(--app-text-secondary);
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  span { font-size: 14px; color: var(--app-text-secondary); }
+}

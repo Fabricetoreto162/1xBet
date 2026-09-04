@@ -1,0 +1,225 @@
+
+/* Style du Spinner de chargement */
+.conteneur-chargement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Centre verticalement sur l'écran */
+  width: 100%;
+}
+
+ion-spinner {
+  --color: #4184C8; /* La couleur bleue que tu as choisie */
+  width: 45px;      /* Taille normale, ni trop petite ni trop grande */
+  height: 45px;
+}
+
+
+
+
+
+
+
+
+
+.menu-page {
+  padding: 16px 16px 24px;
+  background: var(--app-background-muted, #eef1f5);
+}
+
+// ── Bandeau profil ──
+.bandeau-profil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  margin-top: 10px;
+  padding-inline: 10px;
+  color:var(--menu-text);
+
+  .profil {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    text-align: left;
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--app-surface-muted, #dfe4ea);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      img { width: 100px; height: 100px; object-fit: contain; }
+    }
+
+    .infos-profil {
+      display: flex;
+      flex-direction: column;
+
+      strong { font-size: 16px; font-weight: 800; color: var(--app-text); }
+      .sous-texte { font-size: 12.5px; color: var(--menu-icon); font-weight: 600; margin-top: 5px; }
+    }
+  }
+
+  .icones-profil {
+    display: flex;
+    align-items: center;
+    /*gap: 14px;*/
+
+    .btn-icone {
+      position: relative;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img { width: 50px; height: 50px; object-fit: contain; }
+
+   
+    }
+  }
+}
+
+// ── Ligne solde + dépôt ──
+.ligne-solde {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  margin-inline: 10px;
+
+  .pilule-solde {
+    flex: 0 0 52%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    background: rgb(214, 212, 212);
+    border: none;
+    border-radius: 15px;
+    /*padding: 12px 16px;*/
+    
+
+    img { width: 30px; height: 30px; object-fit: contain;  margin-left: 10px !important;}
+    span { font-size: 12px; font-weight: 800;  flex: 1; text-align: left;padding: 0 !important; color: #0B253A; }
+    .chevron { font-size: 20px; color: var(--app-text-secondary);margin-right: 10px !important;}
+  }
+
+  .btn-depot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--app-success);
+    border: none;
+    border-radius: 15px;
+    padding: 12px 10px;
+
+    ion-icon { font-size: 20px; color: #fff; }
+    span { font-size: 12.5px; font-weight: 800; color: #fff; }
+  }
+}
+
+// ── Onglets catégories ──
+.onglets-categories {
+  display: flex;
+  justify-content: space-between;
+  background: var(--app-surface);
+  border-radius: 14px 14px 0 0;
+  padding: 0px 8px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--app-border, rgba(0,0,0,0.06));
+
+  .onglet {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding-bottom: 10px;
+    border-bottom: 3px solid transparent;
+
+    img { width: 35px; height: 35px; object-fit: contain; }
+    span { font-size: 11px; font-weight: 600; color: var(--app-text-secondary); }
+
+    &.actif {
+      border-bottom-color: var(--menu-icon);
+      span { color: var(--menu-icon); font-weight: 700; }
+    }
+  }
+}
+
+// ── Liste de catégories ──
+.liste-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.carte-categorie {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--app-surface);
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+  text-align: left;
+  box-shadow: var(--app-surface-shadow);
+
+  .titre { font-size: 13.5px; font-weight: bold; color: #0B253A; }
+
+  .icone-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  .icone-neutre {
+    background: var(--app-surface-muted, #eef1f5);
+
+    img { width: 35px; height: 35px; object-fit: contain; }
+  }
+
+  &.avec-description {
+    .colonne-texte {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .sous-titre { font-size: 12px; color: var(--app-text-secondary); font-weight: 500; }
+  }
+}
+
+// ── Scroll vertical simple, sans barre visible, sans overscroll bounce ──
+ion-content::part(scroll) {
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+
+  // Masquer la scrollbar (Chrome/Safari/Edge)
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Masquer la scrollbar (Firefox)
+  scrollbar-width: none;
+
+  // Masquer la scrollbar (IE/ancien Edge)
+  -ms-overflow-style: none;
+}

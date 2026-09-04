@@ -1,0 +1,117 @@
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.custom-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px 0 16px;
+  flex-shrink: 0;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--app-text);
+    flex: 1;
+  }
+
+  .btn-add {
+    --color: var(--app-text);
+    font-size: 24px;
+  }
+}
+
+// Liste prenant l'espace restant avec scroll
+.liste-evenements { 
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px; 
+}
+
+.event-card {
+  background: var(--app-surface);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--app-surface-shadow);
+  overflow: hidden;
+
+  .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    .championnat {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--app-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .event-body {
+    padding: 14px;
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--app-text);
+
+      .vs {
+        font-size: 11px;
+        color: var(--app-text-secondary);
+        font-weight: 400;
+      }
+    }
+
+    .bet-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      
+      .option {
+        font-size: 13px;
+        color: var(--app-success);
+        font-weight: 600;
+      }
+      .cote {
+        font-size: 13px;
+        color: var(--app-text);
+        font-weight: 600;
+      }
+    }
+  }
+
+  .event-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 8px 8px 0;
+    
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      margin: 0;
+    }
+  }
+}
+
+.liste-vide {
+  text-align: center;
+  padding: 50px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  span { font-size: 13px; color: var(--app-text-secondary); }
+}

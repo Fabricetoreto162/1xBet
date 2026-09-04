@@ -1,0 +1,51 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête personnalisé -->
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Mon Solde</h1>
+    </div>
+
+    <div class="solde-actuel">
+      <span class="libelle">Solde actuel</span>
+      <strong class="montant">{{ solde }} F</strong>
+    </div>
+
+    <div class="formulaire">
+      <!-- Sélecteur de mode (Créditer / Débiter) -->
+      <ion-segment [(ngModel)]="mode" mode="ios" class="mode-segment">
+        <ion-segment-button value="crediter">
+          <ion-icon name="trending-up-outline"></ion-icon>
+          <ion-label>Créditer</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="debiter">
+          <ion-icon name="trending-down-outline"></ion-icon>
+          <ion-label>Débiter</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <ion-item>
+        <ion-input 
+          [label]="mode === 'crediter' ? 'Montant à ajouter' : 'Montant à retirer'" 
+          labelPlacement="stacked" 
+          type="number" 
+          [(ngModel)]="montant" 
+          placeholder="Ex. 5000">
+        </ion-input>
+      </ion-item>
+      
+      <ion-button 
+        expand="block" 
+        [disabled]="enregistrement" 
+        [color]="mode === 'crediter' ? 'success' : 'danger'" 
+        (click)="valider()">
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+        {{ mode === 'crediter' ? 'Créditer le compte' : 'Débiter le compte' }}
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

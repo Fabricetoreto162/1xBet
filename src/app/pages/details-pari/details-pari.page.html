@@ -1,0 +1,112 @@
+<!-- Bloc de chargement -->
+<div class="conteneur-chargement" *ngIf="chargementEnCours">
+  <ion-spinner name="circular"></ion-spinner>
+</div>
+
+
+
+
+<ion-header class="entete-header" *ngIf="!chargementEnCours">
+  <ion-toolbar>
+    <div class="entete">
+      <button class="btn-icone" (click)="retour()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1>Détails du pari</h1>
+      <button class="btn-icone" (click)="ouvrirMenu()">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- On laisse ion-content gérer le scroll natif (on retire scrollY=false) -->
+<ion-content [fullscreen]="true">
+  <div class="details-page">
+    <ng-container *ngIf="pari">
+
+      <div class="numero-coupon">
+        <span class="date-mise">{{ pari.dateCreation | date:'dd.MM.yyyy(HH:mm)' }}</span>
+        <strong>Combiné N° {{ pari.numero }}</strong>
+      </div>
+
+      <div class="carte-resume">
+        <div class="ligne-detail">
+          <span class="avec-icone">
+            <img src="assets/icons/combine-icon.png" alt="Combiné" class="icone-combine" />
+            Nombre d'événements : {{ nombreEvenements }}
+          </span>
+          <span class="termines">{{ evenementsTermines }} de {{ nombreEvenements }} terminés</span>
+        </div>
+
+        <div class="ligne-detail">
+          <span>Cote :</span>
+          <strong>{{ pari.coteCombinee | number:'1.0-2' }}</strong>
+        </div>
+
+        <div class="ligne-detail">
+          <span>Mise :</span>
+          <strong>{{ pari.mise }} ₣</strong>
+        </div>
+
+        <div class="ligne-detail">
+          <span>{{ libelleGains() }}</span>
+          <strong>{{ gainsAffiches }} ₣</strong>
+        </div>
+
+        <div class="ligne-detail">
+          <span>Statut :</span>
+          <span class="statut" [ngClass]="classeStatutPari()">
+            <ion-icon [name]="iconeStatut(classeStatutPari())"></ion-icon>
+            {{ libelleStatutPari() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="carte-evenement" *ngFor="let j of jambesAffichage">
+               <div class="ligne-sport">
+          <img src="assets/icons/football-icon.png" alt="Football" class="icone-sport" />
+          <span>Football . {{ j.championnat?.nom || 'Championnat' }}</span>
+        </div>
+
+        <div class="ligne-date">
+          <span class="date">{{ j.evenement?.dateHeure | date:'dd.MM.yyyy (HH:mm)' }}</span>
+        </div>
+
+        <div class="ligne-equipes">
+          <div class="equipe equipe1">
+            <span>{{ j.clubDomicile?.nom || '—' }}</span>
+            <img [src]="j.clubDomicile?.logoUrl" [alt]="j.clubDomicile?.nom" />
+          </div>
+
+          <div class="score" *ngIf="j.evenement?.scoreFinal as sf; else pasEncore">
+            {{ sf.a }} : {{ sf.b }}
+          </div>
+          <ng-template #pasEncore><div class="score en-attente">VS</div></ng-template>
+
+          <div class="equipe">
+            <img [src]="j.clubExterieur?.logoUrl" [alt]="j.clubExterieur?.nom" />
+            <span>{{ j.clubExterieur?.nom || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="ligne-detail">
+          <span>{{ libellePronostic(j.jambe) }}</span>
+          <strong>{{ j.jambe.cote }}</strong>
+        </div>
+
+        <div class="ligne-detail">
+          <span>Statut :</span>
+          <span class="statut" [ngClass]="classeStatutJambe(j.jambe.statutJambe)">
+            <ion-icon [name]="iconeStatut(classeStatutJambe(j.jambe.statutJambe))"></ion-icon>
+            {{ libelleStatutJambe(j.jambe.statutJambe) }}
+          </span>
+        </div>
+      </div>
+
+      <button class="btn-dupliquer" (click)="dupliquer()">
+        DUPLIQUER LE COUPON DE PARI
+      </button>
+    </ng-container>
+  </div>
+</ion-content>

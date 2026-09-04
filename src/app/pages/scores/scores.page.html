@@ -1,0 +1,41 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Saisir les scores</h1>
+    </div>
+
+    <div class="liste-scores">
+      
+      <div class="event-card" *ngFor="let ev of evenements">
+        <div class="event-header">
+          <ion-badge color="medium">{{ ev.dateHeure }}</ion-badge>
+        </div>
+        
+        <div class="event-body">
+          <span>{{ getNomClub(ev.equipeADomicileId) }}</span>
+          <span class="vs">vs</span>
+          <span>{{ getNomClub(ev.equipeExterieurId) }}</span>
+        </div>
+
+        <div class="score-input">
+          <ion-item>
+            <!-- Ajout du point d'exclamation sur ev.id! -->
+            <ion-input label="Score (ex: 2-1)" labelPlacement="stacked" [(ngModel)]="scores[ev.id!]"></ion-input>
+          </ion-item>
+          <ion-button (click)="enregistrerScore(ev)">
+            <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="liste-vide" *ngIf="evenements.length === 0">
+        <span>Aucun événement en attente de score.</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

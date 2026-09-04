@@ -1,0 +1,59 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête personnalisé -->
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/tabs/favoris" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Mes Combiners</h1>
+      <ion-button fill="clear" class="btn-add" (click)="allerCreer()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Liste avec scroll vertical -->
+    <div class="liste-combiners">
+      
+      <div class="combiner-card" *ngFor="let c of combiners">
+        <div class="card-left">
+          <ion-icon name="ticket-outline" class="ticket-icon"></ion-icon>
+        </div>
+        
+        <div class="card-content">
+          <div class="code-section">
+            <span class="code-text">{{ c.code }}</span>
+            <ion-button fill="clear" size="small" (click)="copierCode(c.code)">
+              <ion-icon slot="icon-only" name="copy-outline"></ion-icon>
+            </ion-button>
+          </div>
+          
+          <div class="stats-section">
+            <div class="stat">
+              <span class="label">Événements</span>
+              <strong>{{ c.evenementIds.length }}</strong>
+            </div>
+            <div class="stat">
+              <span class="label">Cote totale</span>
+              <strong class="success">{{ c.coteTotal }}</strong>
+            </div>
+          </div>
+
+          <div class="date-section">
+            <span>Créé le {{ c.dateCreation | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- État vide -->
+      <div class="liste-vide" *ngIf="combiners.length === 0">
+        <ion-icon name="ticket-outline" class="empty-icon"></ion-icon>
+        <span>Aucun combiner pour l'instant.</span>
+        <ion-button fill="outline" size="small" (click)="allerCreer()" style="margin-top: 16px;">
+          Créer un combiner
+        </ion-button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

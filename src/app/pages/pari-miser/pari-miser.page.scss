@@ -1,0 +1,399 @@
+/* Bloque complètement le scroll et les interactions de l'arrière-plan */
+ion-content.arriere-plan-gele {
+  --overflow: hidden;
+  pointer-events: none;
+}
+
+ion-toolbar {
+  --background: var(--app-tab-bar-bg);
+  --min-height: auto;
+  padding-top: var(--ion-safe-area-top, 0); /* Gère la barre de statut du téléphone */
+}
+
+.entete-combine {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px;
+  background: var(--app-tab-bar-bg);
+
+  .titre-dropdown {
+    grid-column: 2;
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    span { font-size: 19px; font-weight: 800; color: var(--app-text-secondary); }
+    ion-icon { font-size: 16px; color: var(--app-text-secondary); }
+  }
+
+  .actions-entete {
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    gap: 18px;
+
+    ion-icon { font-size: 20px; color: var(--app-text-secondary); }
+  }
+}
+
+.liste-evenements {
+  padding: 12px 16px 160px; // marge basse pour ne pas passer sous la feuille
+}
+
+.carte-evenement {
+  background: var(--app-surface);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+
+  .ligne-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+
+    .icone-sport {
+     width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+    .statut-temps {
+      flex: 1;
+      font-size: 11.5px;
+      color: var(--app-text-secondary);
+    }
+    .fermer { font-size: 20px; color: var(--menu-icon); font-weight: bold;}
+  }
+
+  .ligne-equipes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    .equipe {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--app-text);
+      justify-content: flex-end; text-align: end; margin-right: 0px !important;
+
+      img { width: 25px; height: 25px; object-fit: contain; }
+    }
+    .equipe-droite { justify-content: flex-start; text-align: start; margin-left: 0px !important; }
+    .vs { font-size: 20px; font-weight: 800; color: var(--app-text); padding: 0 10px; }
+  }
+
+  .ligne-pick {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--app-bg-shell);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: var(--app-text-secondary);
+
+    strong { font-size: 15px; color: var(--app-text); }
+  }
+}
+
+.feuille-mise {
+  padding: 14px 16px 100px;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #ffffff; /* Fond opaque */
+  
+  /* --- MAGIE POUR ANDROID --- */
+  isolation: isolate; /* Crée un contexte de superposition isolé */
+  transform: translateZ(0); /* Force l'accélération matérielle */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  position: relative;
+  z-index: 1;
+
+  .resume {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    .resume-gauche {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--app-text);
+
+      ion-icon { font-size: 16px; color: var(--app-text-secondary); }
+    }
+
+    .resume-centre {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      span { font-size: 14px; color: var(--app-text-secondary); }
+      .confirmation { font-size: 11.5px; color: var(--app-text-secondary); margin-top: 2px; }
+      .coteTotaux {
+        color: var(--menu-text);
+      }
+    }
+
+    .reglages { font-size: 20px; color: var(--menu-icon); }
+  }
+
+  .bouton-pari {
+    width: 100%;
+    background: var(--app-success);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 0;
+    font-size: 16px;
+    font-weight: 800;
+    margin-top: 14px;
+
+    &:disabled {
+      background: #DCE3EA;
+      color: #9BA7B5;
+    }
+  }
+
+  .options-mise {
+    margin-top: 18px;
+
+    .segment {
+      display: flex;
+      background: var(--app-bg-shell);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 16px;
+
+      button {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 8px 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--app-text-secondary);
+        border-radius: 8px;
+
+        &.actif {
+          background: var(--menu-icon);
+          color: white;
+          box-shadow: var(--app-surface-shadow);
+        }
+      }
+    }
+
+    .ligne-compte {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 700;
+
+      .solde-compte {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .add-outline-icon {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background-color: var(--app-success);
+        }
+        .icon-add {
+          font-size: 20px; color: white;
+          display: flex;
+          justify-content: center;
+          font-weight: 600;
+          align-items: center;
+          object-fit: cover;
+        }
+
+        ion-icon { font-size: 14px; color: var(--app-text-secondary); }
+      }
+      > ion-icon { font-size: 18px; color: var(--app-text-secondary); }
+    }
+
+    .stepper-mise {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--app-bg-shell);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 12px;
+      border: 2px solid transparent;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      position: relative;
+      z-index: 1001; 
+
+      &:focus-within {
+        border-color: var(--menu-icon);
+      }
+
+      &.invalide {
+        background: #FBE1E3;
+
+        button { opacity: 0.5; }
+        .plage { color: var(--app-danger); font-weight: 700; }
+      }
+
+      button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: var(--app-surface);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--menu-icon);
+        box-shadow: var(--app-surface-shadow);
+      }
+
+      .valeur-mise {
+        text-align: center;
+
+        .champ-mise-enveloppe {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 4px;
+        }
+
+        .champ-mise {
+          width: 80px;
+          border: none;
+          background: transparent;
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--app-text);
+          text-align: right;
+          font-family: inherit;
+          padding: 0;
+          -moz-appearance: textfield;
+
+          &:focus { outline: none; }
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+        }
+
+        .suffixe { font-size: 20px; font-weight: 700; color: var(--app-text); }
+        .plage { display: block; font-size: 11px; color: var(--app-text-secondary); margin-top: 2px; }
+      }
+    }
+
+    .gains-potentiels {
+      text-align: center;
+      font-size: 13px;
+      color: var(--app-text-secondary);
+      margin-bottom: 14px;
+
+      strong { color: var(--app-success); }
+    }
+
+    .raccourcis-mise {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0 8px;
+
+      button {
+        flex: 1;
+        background: var(--menu-icon);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 0;
+        font-size: 13px;
+        font-weight: 700;
+      }
+    }
+
+    .aide-raccourcis {
+      text-align: start;
+      font-size: 13px;
+      color: var(--app-text-secondary);
+      margin: 15px 0 0 0;
+      width: 100% !important;
+    }
+  }
+}
+
+.fond-alerte {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 40, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.alerte-suppression {
+  background: var(--app-surface);
+  border-radius: 18px;
+  padding: 26px 22px 22px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+
+  h3 { font-size: 18px; font-weight: 800; color: var(--app-header-text); margin: 0 0 10px; }
+  p { font-size: 13.5px; color: var(--app-text-secondary); margin: 0 0 22px; line-height: 1.4; }
+
+  .boutons-alerte {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-alerte {
+    flex: 1;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 700;
+    background: #DCEBFA;
+    color: var(--app-primary);
+  }
+}
+
+/* La modale s'arrête au-dessus de la tab bar */
+ion-modal {
+  --border-radius: 20px;
+  --background: #ffffff;
+  z-index: 2000 !important; 
+  margin-bottom: 80px !important; /* <-- REMIS ICI pour laisser passer la tab bar et le bouton flottant */
+}
+
+.inner-scroll {
+  color: #ffffff;
+}
+
+ion-content {
+  color: #ffffff;
+  --background: #fff;
+}
+
+
+/* Quand le clavier est ouvert, la modale touche le haut et le bas de l'écran */
+ion-modal.clavier-actif {
+  margin-bottom: 0 !important;
+  --border-radius: 0; /* Retire les bords arrondis en haut pour toucher le bord */
+}

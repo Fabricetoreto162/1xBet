@@ -1,0 +1,64 @@
+.custom-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px 0 16px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+}
+
+.formulaire {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 20px; /* Espace normal en bas de la liste */
+
+  ion-item { 
+    --background: var(--app-surface); 
+    border-radius: 12px; 
+  }
+}
+
+.champ-date {
+  background: var(--app-surface);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: var(--app-surface-shadow);
+
+  label { display: block; font-size: 12px; color: var(--app-text-secondary); margin-bottom: 4px; }
+  input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    color: var(--app-text);
+    font-family: inherit;
+  }
+}
+
+.bloc-total {
+  background: var(--app-surface);
+  border-radius: 12px;
+  padding: 12px 14px 4px;
+  box-shadow: var(--app-surface-shadow);
+
+  .titre-bloc { display: block; font-size: 12px; color: var(--app-text-secondary); margin-bottom: 8px; }
+  ion-segment { margin-bottom: 8px; }
+  ion-item { --background: transparent; --padding-start: 0; }
+}
+
+/* Styles du footer */
+.bottom-buttons {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: white;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}

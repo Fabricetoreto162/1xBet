@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    
+    <!-- En-tête personnalisé -->
+    <div class="custom-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+      </ion-buttons>
+      <h1>Championnats</h1>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="formulaire">
+      <ion-item>
+        <ion-input label="Nom du championnat" labelPlacement="stacked" [(ngModel)]="nom" placeholder="Ex. La Liga"></ion-input>
+      </ion-item>
+      <ion-button expand="block" [disabled]="enregistrement" (click)="ajouter()">Ajouter le championnat</ion-button>
+    </div>
+
+    <!-- Liste avec scroll vertical -->
+    <div class="liste-championnats">
+      <div class="championnat" *ngFor="let c of championnats">
+        
+        <!-- Mode Affichage -->
+        <ng-container *ngIf="championnatEnEdition?.id !== c.id; else modeEdition">
+          <span class="nom-championnat">{{ c.nom }}</span>
+          
+          <div class="actions">
+            <ion-button fill="clear" size="small" (click)="demarrerEdition(c)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" size="small" (click)="supprimer(c)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ng-container>
+
+        <!-- Mode Édition -->
+        <ng-template #modeEdition>
+          <div class="edition-formulaire">
+            <ion-item>
+              <ion-input label="Nom" labelPlacement="stacked" [(ngModel)]="nomEdit"></ion-input>
+            </ion-item>
+            <div class="edition-actions">
+              <ion-button size="small" (click)="enregistrerEdition()">
+                <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+                Enregistrer
+              </ion-button>
+              <ion-button size="small" color="medium" fill="outline" (click)="annulerEdition()">
+                <ion-icon slot="start" name="close-outline"></ion-icon>
+                Annuler
+              </ion-button>
+            </div>
+          </div>
+        </ng-template>
+
+      </div>
+
+      <div class="liste-vide" *ngIf="championnats.length === 0">
+        <span>Aucun championnat pour l'instant.</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

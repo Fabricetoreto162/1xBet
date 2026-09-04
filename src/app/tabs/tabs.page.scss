@@ -1,0 +1,103 @@
+
+ion-tab-bar {
+  --background: var(--app-tab-bar-bg);
+  --color: var(--app-tab-inactive);
+  --color-selected: var(--menu-icon);
+  padding-top: 10px !important;
+  --padding-bottom: 0 !important;
+  --margin-bottom: 0 !important;
+
+  height: 50px;
+  border-top: 1.2px solid var(--app-border-subtle);
+
+  position: fixed; /* <-- CHANGÉ ICI de relative à fixed */
+  bottom: 0;       /* <-- AJOUTÉ ICI pour la coller en bas */
+  width: 100%;     /* <-- AJOUTÉ ICI pour qu'elle prenne toute la largeur */
+
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  z-index: 25000 !important;
+
+  padding: 4px 10px 3px;
+ /* box-sizing: border-box;*/
+}
+
+ion-tab-button {
+  flex: 0 0 auto;
+
+  height: 100%;
+  min-width: 58px;
+
+  font-size: 11px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 25px;
+    margin-bottom: 3px;
+  }
+}
+
+/* Espace réservé au Coupon */
+.coupon-space {
+  width: 58px;
+  height: 100%;
+  flex: 0 0 auto;
+}
+
+/* Coupon flottant */
+.coupon-floating {
+  position: fixed;
+  --z-index: 30000 !important;
+
+  left: 50%;
+  bottom: 15px;
+  transform: translateX(-50%);
+  width: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  .coupon-fab {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: var(--menu-icon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(47, 128, 196, 0.4);
+
+    ion-icon {
+      color: #fff;
+      font-size: 30px;
+    }
+  }
+
+  span {
+    margin-top: 4px;
+    margin-bottom: -7px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--app-tab-inactive);
+    white-space: nowrap;
+  }
+}
+
+.coupon-floating:active span { color: var(--menu-icon); }
+
+
+
+
+
+
+
+ion-tab-bar.clavier-actif {
+  transform: translateY(100%);
+  transition: transform 0.2s ease-out;
+}

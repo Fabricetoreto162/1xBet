@@ -1,0 +1,136 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="entete-combine">
+      <div class="titre-dropdown">
+        <span>Combiné</span>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </div>
+      <div class="actions-entete">
+        <ion-icon name="trash-outline" (click)="ouvrirConfirmationSuppression()"></ion-icon>
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="!modalOuvert" [class.arriere-plan-gele]="modalOuvert">
+
+  <div class="liste-evenements" [class.cache-cartes]="clavierOuvert">
+    <div class="carte-evenement" *ngFor="let l of lignes">
+      <div class="ligne-info">
+        <img src="assets/icons/football-icon.png" alt="Football" class="icone-sport" />
+        <span class="statut-temps">{{ l.evenement.dateHeure | date:'dd.MM.yyyy (HH:mm)' }}</span>
+        <ion-icon name="close-outline" class="fermer" (click)="retirerEvenement(l.evenement.id!)"></ion-icon>
+      </div>
+
+      <div class="ligne-equipes">
+        <div class="equipe equipe-gauche">
+          <span>{{ l.nomDomicile }}</span>
+          <img *ngIf="l.logoDomicile" [src]="l.logoDomicile" [alt]="l.nomDomicile" />
+        </div>
+        <strong class="vs">VS</strong>
+        <div class="equipe equipe-droite">
+          <img *ngIf="l.logoExterieur" [src]="l.logoExterieur" [alt]="l.nomExterieur" />
+          <span>{{ l.nomExterieur }}</span>
+        </div>
+      </div>
+
+      <div class="ligne-pick">
+        <span>Temps réglementaire, Total: ({{ l.evenement.seuilTotal }}) {{ l.evenement.sens === 'plus' ? 'Plus de' : 'Moins de' }}</span>
+        <strong>{{ l.evenement.cote }}</strong>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-modal
+  #sheetModal
+  class="feuille-persistante"
+  [class.clavier-actif]="clavierOuvert"
+  [isOpen]="modalOuvert"
+  [breakpoints]="[0.22, 0.70, 0.90]"
+  [initialBreakpoint]="0.22"
+  [showBackdrop]="true"
+  style="--backdrop-opacity: 0;" 
+  (ionBreakpointDidChange)="onBreakpointChange($event)"
+>
+
+  <ng-template>
+    <div class="feuille-mise">
+      <div class="resume">
+        <div class="resume-gauche">
+          <ion-icon name="ticket"></ion-icon>
+          <span>{{ lignes.length }}</span>
+        </div>
+        <div class="resume-centre">
+          <span>Cote : <strong class="coteTotaux">{{ coteTotal | number:'1.0-2' }}</strong></span>
+          <span class="confirmation">Si la cote change me demander de confirmer </span>
+        </div>
+        <ion-icon name="settings-outline" class="reglages"></ion-icon>
+      </div>
+
+      <button class="bouton-pari" *ngIf="!optionsOuvertes" (click)="ouvrirOptions()">Pari</button>
+
+      <div class="options-mise">
+        <div class="segment">
+          <button [class.actif]="onglet === 'mise'" (click)="choisirOnglet('mise')">Mise</button>
+          <button [class.actif]="onglet === 'promo'" (click)="choisirOnglet('promo')">Code promo</button>
+          <button [class.actif]="onglet === 'reference'" (click)="choisirOnglet('reference')">Cote de référence</button>
+        </div>
+
+        <div class="ligne-compte">
+          <span class="solde-compte"> 
+            <div class="add-outline-icon">
+              <ion-icon class="icon-add" name="add-outline"></ion-icon>
+            </div> 
+            {{ texteSolde }} ₣ 
+            <ion-icon name="chevron-down-outline"></ion-icon>
+          </span>
+          <ion-icon name="refresh-outline"></ion-icon>
+        </div>
+
+        <div class="stepper-mise" [class.invalide]="miseInvalide">
+          <button (click)="decrementer()">−</button>
+          <div class="valeur-mise">
+            <div class="champ-mise-enveloppe">
+              <input
+                type="number"
+                class="champ-mise"
+                [(ngModel)]="mise"
+                name="mise"
+                (change)="clamperMise()"
+              />
+              <span class="suffixe">₣</span>
+            </div>
+            <span class="plage">{{ texteMisePlage }}</span>
+          </div>
+          <button (click)="incrementer()">+</button>
+        </div>
+
+        <div class="gains-potentiels">
+          Gains potentiels : <strong>{{ texteGainsPotentiels }}</strong>
+        </div>
+
+        <button class="bouton-pari" [disabled]="!mise || mise < miseMin" (click)="placerPari()">Pari</button>
+
+        <div class="raccourcis-mise">
+          <button (click)="choisirMontant(90)">90 ₣</button>
+          <button (click)="choisirMontant(1000)">1000 ₣</button>
+          <button (click)="choisirMontant(2500)">2500 ₣</button>
+        </div>
+        <p class="aide-raccourcis">Placez un pari instantanément en cliquant sur un montant</p>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>
+
+<div class="fond-alerte" *ngIf="confirmationSuppressionOuverte">
+  <div class="alerte-suppression">
+    <h3>Vider le coupon de pari ?</h3>
+    <p>Êtes-vous sûr de vouloir effacer cette liste ?</p>
+    <div class="boutons-alerte">
+      <button class="btn-alerte" (click)="annulerSuppression()">Annuler</button>
+      <button class="btn-alerte" (click)="confirmerSuppression()">OK</button>
+    </div>
+  </div>
+</div>

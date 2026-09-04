@@ -1,0 +1,62 @@
+<ion-content [fullscreen]="true">
+  <div class="custom-header">
+    <ion-buttons>
+      <ion-back-button defaultHref="/populaire" text=""></ion-back-button>
+    </ion-buttons>
+    <h1>{{ isEditMode ? 'Modifier l\'événement' : 'Créer un événement' }}</h1>
+  </div>
+
+  <div class="formulaire">
+    <ion-item>
+      <ion-select label="Équipe à domicile" labelPlacement="stacked" [(ngModel)]="equipeADomicileId" placeholder="Choisir un club">
+        <ion-select-option *ngFor="let c of clubs" [value]="c.id">{{ c.nom }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Équipe à l'extérieur" labelPlacement="stacked" [(ngModel)]="equipeExterieurId" placeholder="Choisir un club">
+        <ion-select-option *ngFor="let c of clubs" [value]="c.id">{{ c.nom }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Championnat" labelPlacement="stacked" [(ngModel)]="championnatId" placeholder="Choisir un championnat">
+        <ion-select-option *ngFor="let c of championnats" [value]="c.id">{{ c.nom }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <div class="champ-date">
+      <label>Date et heure</label>
+      <input type="datetime-local" [(ngModel)]="dateHeure" />
+    </div>
+
+    <div class="bloc-total">
+      <span class="titre-bloc">Option Total</span>
+      <ion-segment [(ngModel)]="sens">
+        <ion-segment-button value="plus"><ion-label>Plus de</ion-label></ion-segment-button>
+        <ion-segment-button value="moins"><ion-label>Moins de</ion-label></ion-segment-button>
+      </ion-segment>
+      <ion-item>
+        <ion-input label="Seuil (ex. 2.5)" labelPlacement="stacked" type="number" inputmode="decimal" step="any" [(ngModel)]="seuilTotal"></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-item>
+      <ion-input label="Cote" labelPlacement="stacked" type="number" inputmode="decimal" step="any" [(ngModel)]="cote" placeholder="Ex. 1.86"></ion-input>
+    </ion-item>
+  </div>
+</ion-content>
+
+<!-- Utilisation de ion-footer pour éviter le bug du clavier -->
+<ion-footer class="ion-no-border">
+  <div class="bottom-buttons">
+    <ion-button expand="block" [disabled]="!formulaireValide || enregistrement" (click)="sauvegarder()">
+      <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+      {{ isEditMode ? 'Enregistrer' : 'Créer l\'événement' }}
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="medium" (click)="allerVersListe()">
+      Voir la liste des événements
+    </ion-button>
+  </div>
+</ion-footer>
