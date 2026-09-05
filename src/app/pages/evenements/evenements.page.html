@@ -122,8 +122,14 @@
 
       </div>
 
+      <!-- État chargement -->
+      <div class="liste-vide" *ngIf="chargement">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p style="color: #64748b; font-size: 14px; margin-top: 12px;">Chargement de vos matchs...</p>
+      </div>
+
       <!-- État vide -->
-      <div class="liste-vide" *ngIf="evenementsFiltres.length === 0">
+      <div class="liste-vide" *ngIf="!chargement && evenementsFiltres.length === 0">
         <div class="empty-icon-circle">
           <ion-icon name="calendar-outline"></ion-icon>
         </div>

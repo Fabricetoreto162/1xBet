@@ -118,13 +118,14 @@ export class PopulairePage implements OnInit, OnDestroy {
     this.chargement = true;
 
     try {
-      const [clubs, championnats, montantSolde] = await Promise.all([
+      const [clubs, championnats, montantSolde, evenements] = await Promise.all([
         this.clubsSvc.listerTous(),
         this.championnatsSvc.listerTous(),
         this.soldeSvc.getMontant(),
         this.evenementsSvc.listerTous()
       ]);
 
+      this.evenements = evenements || [];
       this.nombreClubs = clubs.length;
       this.nombreChampionnats = championnats.length;
       this.solde = montantSolde;

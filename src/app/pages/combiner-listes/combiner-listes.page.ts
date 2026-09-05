@@ -38,19 +38,34 @@ export class CombinerListesPage implements OnInit, OnDestroy {
   async ngOnInit() {
     this.sub.add(
       this.combinersSvc.ecouterCombiners().subscribe((list: Combiner[]) => {
-        if (list && list.length > 0) {
-          this.combiners = list;
-          this.cdr.detectChanges();
-        }
+        this.combiners = this.dedupliquer(list || []);
+        this.cdr.detectChanges();
       })
     );
-    this.combiners = await this.combinersSvc.listerTous();
+    const initial = await this.combinersSvc.listerTous();
+    this.combiners = this.dedupliquer(initial || []);
     this.cdr.detectChanges();
   }
 
   async ionViewWillEnter() {
-    this.combiners = await this.combinersSvc.listerTous();
+    const list = await this.combinersSvc.listerTous();
+    this.combiners = this.dedupliquer(list || []);
     this.cdr.detectChanges();
+  }
+
+  private dedupliquer(list: Combiner[]): Combiner[] {
+    const map = new Map<string, Combiner>();
+    for (const c of list) {
+      const key = c.id || c.code;
+      if (key && !map.has(key)) {
+        map.set(key, c);
+      }
+    }
+    return Array.from(map.values());
+  }
+
+  trackByCombiner(index: number, item: Combiner): string {
+    return item.id || item.code || index.toString();
   }
 
   ngOnDestroy() {

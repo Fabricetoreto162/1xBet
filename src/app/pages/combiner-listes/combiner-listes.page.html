@@ -15,7 +15,7 @@
     <!-- Liste avec scroll vertical -->
     <div class="liste-combiners">
       
-      <div class="combiner-card" *ngFor="let c of combiners">
+      <div class="combiner-card" *ngFor="let c of combiners; trackBy: trackByCombiner">
         <div class="card-left">
           <ion-icon name="ticket-outline" class="ticket-icon"></ion-icon>
         </div>

@@ -18,4 +18,5 @@ export interface Pari {
   gains: number;
   evenementIds: string[];
   jambes: JambePari[];
+  enDirect?: boolean;
 }

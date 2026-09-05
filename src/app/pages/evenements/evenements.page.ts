@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonContent, IonItem, IonButton, IonIcon, IonButtons, IonBackButton, 
-  IonSearchbar, LoadingController, ToastController, AlertController
+  IonSearchbar, IonSpinner, LoadingController, ToastController, AlertController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
@@ -27,7 +27,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule, FormsModule, IonContent, IonButton, IonIcon, 
-    IonButtons, IonBackButton, IonSearchbar
+    IonButtons, IonBackButton, IonSearchbar, IonSpinner
   ],
   templateUrl: './evenements.page.html',
   styleUrls: ['./evenements.page.scss']
@@ -37,6 +37,7 @@ export class EvenementsPage implements OnInit, OnDestroy {
   clubsMap: Record<string, Club> = {};
   championnatsMap: Record<string, Championnat> = {};
   championnatsListe: Championnat[] = [];
+  chargement = false;
   
   // Recherche et filtres
   recherche = '';
@@ -110,12 +111,15 @@ export class EvenementsPage implements OnInit, OnDestroy {
   async chargerDonnees() {
     if (!this.userId) return;
 
+    this.chargement = true;
     try {
-      const [clubs, championnats] = await Promise.all([
-        this.clubsSvc.listerTous(),
-        this.championnatsSvc.listerTous(),
-        this.evenementsSvc.listerTous()
+      const [clubs, championnats, evenements] = await Promise.all([
+        this.clubsSvc.listerTous(true),
+        this.championnatsSvc.listerTous(true),
+        this.evenementsSvc.listerTous(true)
       ]);
+      
+      this.evenements = evenements || [];
       
       const newClubsMap: Record<string, Club> = {};
       clubs.forEach(c => {
@@ -133,6 +137,9 @@ export class EvenementsPage implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     } catch (e) {
       console.error("Erreur chargement données événements", e);
+    } finally {
+      this.chargement = false;
+      this.cdr.detectChanges();
     }
   }
 

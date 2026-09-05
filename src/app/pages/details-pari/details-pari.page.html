@@ -3,9 +3,6 @@
   <ion-spinner name="circular"></ion-spinner>
 </div>
 
-
-
-
 <ion-header class="entete-header" *ngIf="!chargementEnCours">
   <ion-toolbar>
     <div class="entete">
@@ -20,18 +17,36 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- On laisse ion-content gérer le scroll natif (on retire scrollY=false) -->
+<!-- On laisse ion-content gérer le scroll natif -->
 <ion-content [fullscreen]="true">
-  <div class="details-page">
-    <ng-container *ngIf="pari">
+  <div class="details-page" *ngIf="!chargementEnCours && pari">
 
-      <div class="numero-coupon">
-        <span class="date-mise">{{ pari.dateCreation | date:'dd.MM.yyyy(HH:mm)' }}</span>
-        <strong>Combiné N° {{ pari.numero }}</strong>
+    <!-- Ticket coupon principal -->
+    <div class="ticket-carte">
+
+      <!-- 1. En-tête : Date, badge direct, type de pari et numéro -->
+      <div class="section-ticket section-entete">
+        <div class="ligne-date-badge">
+          <span class="date-ticket">{{ pari.dateCreation | date:'dd.MM.yyyy (HH:mm)' }}</span>
+          <span class="badge-direct" *ngIf="pari.enDirect !== false">
+            <span class="point-badge">●</span> En direct
+          </span>
+        </div>
+
+        <div class="ligne-titre-combine">
+          <span class="type-combine">Combiné</span>
+          <span class="numero-combine">№ {{ pari.numero }}</span>
+        </div>
       </div>
 
-      <div class="carte-resume">
-        <div class="ligne-detail">
+      <!-- Séparateur ticket avec encoches et tirets -->
+      <div class="separateur-ticket">
+        <div class="ligne-tiret"></div>
+      </div>
+
+      <!-- 2. Résumé des cotes, mises, gains et statut -->
+      <div class="section-ticket section-resume">
+        <div class="ligne-detail ligne-nb-evenements">
           <span class="avec-icone">
             <img src="assets/icons/combine-icon.png" alt="Combiné" class="icone-combine" />
             Nombre d'événements : {{ nombreEvenements }}
@@ -40,22 +55,22 @@
         </div>
 
         <div class="ligne-detail">
-          <span>Cote :</span>
-          <strong>{{ pari.coteCombinee | number:'1.0-2' }}</strong>
+          <span class="libelle">Cote :</span>
+          <strong class="valeur">{{ pari.coteCombinee | number:'1.0-2' }}</strong>
         </div>
 
         <div class="ligne-detail">
-          <span>Mise :</span>
-          <strong>{{ pari.mise }} ₣</strong>
+          <span class="libelle">Mise :</span>
+          <strong class="valeur">{{ pari.mise }} F</strong>
         </div>
 
         <div class="ligne-detail">
-          <span>{{ libelleGains() }}</span>
-          <strong>{{ gainsAffiches }} ₣</strong>
+          <span class="libelle">{{ libelleGains() }}</span>
+          <strong class="valeur-gains">{{ gainsAffiches }} F</strong>
         </div>
 
         <div class="ligne-detail">
-          <span>Statut :</span>
+          <span class="libelle">Statut :</span>
           <span class="statut" [ngClass]="classeStatutPari()">
             <ion-icon [name]="iconeStatut(classeStatutPari())"></ion-icon>
             {{ libelleStatutPari() }}
@@ -63,50 +78,73 @@
         </div>
       </div>
 
-      <div class="carte-evenement" *ngFor="let j of jambesAffichage">
-               <div class="ligne-sport">
-          <img src="assets/icons/football-icon.png" alt="Football" class="icone-sport" />
-          <span>Football . {{ j.championnat?.nom || 'Championnat' }}</span>
+      <!-- 3. Liste des événements (chacun précédé d'un séparateur à encoches) -->
+      <ng-container *ngFor="let j of jambesAffichage">
+        <div class="separateur-ticket">
+          <div class="ligne-tiret"></div>
         </div>
 
-        <div class="ligne-date">
-          <span class="date">{{ j.evenement?.dateHeure | date:'dd.MM.yyyy (HH:mm)' }}</span>
-        </div>
-
-        <div class="ligne-equipes">
-          <div class="equipe equipe1">
-            <span>{{ j.clubDomicile?.nom || '—' }}</span>
-            <img [src]="j.clubDomicile?.logoUrl" [alt]="j.clubDomicile?.nom" />
+        <div class="section-ticket section-evenement">
+          <div class="ligne-sport">
+            <img src="assets/icons/football-icon.png" alt="Football" class="icone-sport" />
+            <span class="nom-sport">Football . {{ j.championnat?.nom || 'Championnat' }}</span>
           </div>
 
-          <div class="score" *ngIf="j.evenement?.scoreFinal as sf; else pasEncore">
-            {{ sf.a }} : {{ sf.b }}
+          <div class="ligne-date-ev">
+            <span class="date-ev">{{ j.evenement?.dateHeure | date:'dd.MM.yyyy (HH:mm)' }}</span>
+            <span class="badge-direct" *ngIf="j.evenement?.enDirect">
+              <span class="point-badge">●</span> En direct
+            </span>
           </div>
-          <ng-template #pasEncore><div class="score en-attente">VS</div></ng-template>
 
-          <div class="equipe">
-            <img [src]="j.clubExterieur?.logoUrl" [alt]="j.clubExterieur?.nom" />
-            <span>{{ j.clubExterieur?.nom || '—' }}</span>
+          <div class="bloc-equipes">
+            <div class="ligne-equipes">
+              <div class="equipe equipe1">
+                <span class="nom-equipe">{{ j.clubDomicile?.nom || '—' }}</span>
+                <img [src]="j.clubDomicile?.logoUrl" [alt]="j.clubDomicile?.nom" (error)="onErreurLogo($event)" class="logo-equipe" />
+              </div>
+
+              <div class="score-principal" *ngIf="j.evenement?.scoreFinal as sf; else pasEncore">
+                {{ sf.a }} : {{ sf.b }}
+              </div>
+              <ng-template #pasEncore><div class="score-principal en-attente">VS</div></ng-template>
+
+              <div class="equipe equipe2">
+                <img [src]="j.clubExterieur?.logoUrl" [alt]="j.clubExterieur?.nom" (error)="onErreurLogo($event)" class="logo-equipe" />
+                <span class="nom-equipe">{{ j.clubExterieur?.nom || '—' }}</span>
+              </div>
+            </div>
+
+            <div class="score-detail-mitemps" *ngIf="j.evenement?.scoreFinal as sf">
+              {{ sf.a }}:{{ sf.b }} ({{ getDetailMiTemps(sf, j.evenement) }})
+            </div>
+          </div>
+
+          <div class="ligne-detail">
+            <span class="libelle-prono">{{ libellePronostic(j.jambe) }}</span>
+            <strong class="cote-prono">{{ j.jambe.cote }}</strong>
+          </div>
+
+          <div class="ligne-detail ligne-live" *ngIf="j.evenement?.enDirect || j.evenement?.tempsEcoule">
+            <span class="label-live">EN DIRECT</span>
+            <span class="temps-live">temps écoulé : {{ j.evenement?.tempsEcoule || '90:00' }}</span>
+          </div>
+
+          <div class="ligne-detail">
+            <span class="libelle">Statut :</span>
+            <span class="statut" [ngClass]="classeStatutJambe(j.jambe.statutJambe)">
+              <ion-icon [name]="iconeStatut(classeStatutJambe(j.jambe.statutJambe))"></ion-icon>
+              {{ libelleStatutJambe(j.jambe.statutJambe) }}
+            </span>
           </div>
         </div>
+      </ng-container>
 
-        <div class="ligne-detail">
-          <span>{{ libellePronostic(j.jambe) }}</span>
-          <strong>{{ j.jambe.cote }}</strong>
-        </div>
+    </div>
 
-        <div class="ligne-detail">
-          <span>Statut :</span>
-          <span class="statut" [ngClass]="classeStatutJambe(j.jambe.statutJambe)">
-            <ion-icon [name]="iconeStatut(classeStatutJambe(j.jambe.statutJambe))"></ion-icon>
-            {{ libelleStatutJambe(j.jambe.statutJambe) }}
-          </span>
-        </div>
-      </div>
+    <button class="btn-dupliquer" (click)="dupliquer()">
+      DUPLIQUER LE COUPON DE PARI
+    </button>
 
-      <button class="btn-dupliquer" (click)="dupliquer()">
-        DUPLIQUER LE COUPON DE PARI
-      </button>
-    </ng-container>
   </div>
 </ion-content>

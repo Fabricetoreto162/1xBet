@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { flame, star, ticket, time, grid } from 'ionicons/icons';
 import { Keyboard } from '@capacitor/keyboard';
 import { PluginListenerHandle } from '@capacitor/core';
+import { CouponBadgeService } from '../core/services/coupon-badge.service';
 
 @Component({
   selector: 'app-tabs',
@@ -18,6 +19,7 @@ import { PluginListenerHandle } from '@capacitor/core';
 })
 export class TabsPage implements OnInit, OnDestroy {
   clavierOuvert = false;
+  readonly badgeSvc = inject(CouponBadgeService);
   
   // Variables pour stocker les écouteurs et pouvoir les retirer proprement
   private keyboardShowHandle?: PluginListenerHandle;

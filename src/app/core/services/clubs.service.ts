@@ -21,15 +21,20 @@ export class ClubsService {
   }
 
   private initEcoute(): void {
-    if (this.ecouteActive) return;
     const userId = this.profilSvc.currentUserId;
     if (!userId) return;
+    if (this.ecouteActive) return;
 
     this.ecouteActive = true;
     try {
-      const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
+      const q = query(this.ref, where('userId', '==', userId));
       onSnapshot(q, (snap) => {
-        const clubs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Club));
+        const map = new Map<string, Club>();
+        snap.docs.forEach(d => {
+          map.set(d.id, { id: d.id, ...d.data() } as Club);
+        });
+        const clubs = Array.from(map.values());
+        clubs.sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
         this.clubsCache = clubs;
         this.clubsSubject.next(clubs);
       }, (err) => console.warn('Erreur écoute clubs', err));
@@ -42,15 +47,27 @@ export class ClubsService {
     const userId = this.profilSvc.currentUserId;
     if (!userId) return [];
 
+    this.initEcoute();
+
     if (this.clubsCache !== null && !forceRefresh) {
       return this.clubsCache;
     }
-    const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
-    const snap = await getDocs(q);
-    const clubs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Club));
-    this.clubsCache = clubs;
-    this.clubsSubject.next(clubs);
-    return clubs;
+    try {
+      const q = query(this.ref, where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const map = new Map<string, Club>();
+      snap.docs.forEach(d => {
+        map.set(d.id, { id: d.id, ...d.data() } as Club);
+      });
+      const clubs = Array.from(map.values());
+      clubs.sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
+      this.clubsCache = clubs;
+      this.clubsSubject.next(clubs);
+      return clubs;
+    } catch (e) {
+      console.warn('Erreur getDocs clubs:', e);
+      return this.clubsCache || [];
+    }
   }
 
   ecouterClubs(): Observable<Club[]> {
@@ -74,8 +91,8 @@ export class ClubsService {
     const docRef = await addDoc(this.ref, clubAvecUserId);
     const nouveau = { ...clubAvecUserId, id: docRef.id };
     
-    // On utilise || [] pour éviter l'erreur si le cache est null
-    this.clubsCache = [...(this.clubsCache || []), nouveau].sort((a, b) => a.nom.localeCompare(b.nom));
+    const sansNouveau = (this.clubsCache || []).filter(c => c.id !== docRef.id);
+    this.clubsCache = [...sansNouveau, nouveau].sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
     this.clubsSubject.next(this.clubsCache);
     
     return docRef.id;

@@ -109,6 +109,33 @@
           </div>
         </div>
 
+        <!-- Saisie des scores par mi-temps -->
+        <div class="mitemps-row">
+          <div class="input-container mitemps-col">
+            <div class="input-header-label">1ère mi-temps</div>
+            <ion-item lines="none" class="score-input-item mitemps-input">
+              <ion-input 
+                placeholder="Ex: 2-0" 
+                [(ngModel)]="scoresMT1[ev.id!]"
+                (ionInput)="surChangementMiTemps(ev.id!)"
+                class="score-text-input">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="input-container mitemps-col">
+            <div class="input-header-label">2ème mi-temps</div>
+            <ion-item lines="none" class="score-input-item mitemps-input">
+              <ion-input 
+                placeholder="Ex: 0-1" 
+                [(ngModel)]="scoresMT2[ev.id!]"
+                (ionInput)="surChangementMiTemps(ev.id!)"
+                class="score-text-input">
+              </ion-input>
+            </ion-item>
+          </div>
+        </div>
+
         <!-- Bloc de saisie du score et validation -->
         <div class="score-input-section">
           
@@ -119,6 +146,7 @@
               <ion-input 
                 placeholder="Ex: 2-1" 
                 [(ngModel)]="scores[ev.id!]"
+                (ionInput)="surChangementScoreFinal(ev.id!)"
                 class="score-text-input">
               </ion-input>
             </ion-item>
@@ -132,6 +160,11 @@
             Valider
           </ion-button>
 
+        </div>
+
+        <!-- Aperçu dynamique du format détaillé -->
+        <div class="apercu-score" *ngIf="getApercuScore(ev.id!) as apercu">
+          <span>Format affiché dans les détails : <strong>{{ apercu }}</strong></span>
         </div>
 
       </div>

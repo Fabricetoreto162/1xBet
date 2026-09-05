@@ -27,22 +27,18 @@ export class HistoriquePage implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-   async ngOnInit() {
-    // On met le chargement à true au début
-    this.chargementEnCours = true; 
+  async ngOnInit() {
+    this.chargementEnCours = this.paris.length === 0;
 
+    // 1. Écoute en temps réel des paris
     this.subs.add(
       this.parisSvc.ecouterParis().subscribe((paris: Pari[]) => {
         this.paris = paris || [];
-        
-        // DÈS QU'ON A LES DONNÉES, ON ARRÊTE LE CHARGEMENT
-        this.chargementEnCours = false; 
-        setTimeout(() => {
-      this.chargementEnCours = false;
-      this.cdr.detectChanges();
-    }, 100000);
+        this.chargementEnCours = false;
+        this.cdr.detectChanges();
       })
     );
+
     // 2. Écoute en temps réel du solde
     this.subs.add(
       this.soldeSvc.solde$.subscribe((solde: number) => {
@@ -51,12 +47,34 @@ export class HistoriquePage implements OnInit, OnDestroy {
       })
     );
 
-    // On lance un chargement initial du solde au cas où l'écouteur n'ait pas encore lancé le subject
-    this.solde = await this.soldeSvc.getMontant();
-    this.cdr.detectChanges();
+    await this.actualiser();
   }
 
-  // ON SUPPRIME COMPLÈTEMENT ionViewWillEnter car l'écouteur s'occupe de tout !
+  // Se déclenche automatiquement à chaque visite de la page
+  async ionViewWillEnter() {
+    await this.actualiser();
+  }
+
+  async actualiser() {
+    if (this.paris.length === 0) {
+      this.chargementEnCours = true;
+      this.cdr.detectChanges();
+    }
+
+    try {
+      const [paris, solde] = await Promise.all([
+        this.parisSvc.listerTous(true),
+        this.soldeSvc.getMontant()
+      ]);
+      this.paris = paris || [];
+      this.solde = solde;
+    } catch (err) {
+      console.warn('Erreur chargement historique:', err);
+    } finally {
+      this.chargementEnCours = false;
+      this.cdr.detectChanges();
+    }
+  }
 
   ngOnDestroy() {
     this.subs.unsubscribe();

@@ -25,15 +25,20 @@ export class ChampionnatsService {
   }
 
   private initEcoute(): void {
-    if (this.ecouteActive) return;
     const userId = this.profilSvc.currentUserId;
     if (!userId) return;
+    if (this.ecouteActive) return;
 
     this.ecouteActive = true;
     try {
-      const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
+      const q = query(this.ref, where('userId', '==', userId));
       onSnapshot(q, (snap) => {
-        const championnats = snap.docs.map(d => ({ id: d.id, ...d.data() } as Championnat));
+        const map = new Map<string, Championnat>();
+        snap.docs.forEach(d => {
+          map.set(d.id, { id: d.id, ...d.data() } as Championnat);
+        });
+        const championnats = Array.from(map.values());
+        championnats.sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
         this.championnatsCache = championnats;
         this.championnatsSubject.next(championnats);
       }, (err) => console.warn('Erreur écoute championnats', err));
@@ -46,15 +51,27 @@ export class ChampionnatsService {
     const userId = this.profilSvc.currentUserId;
     if (!userId) return [];
 
+    this.initEcoute();
+
     if (this.championnatsCache !== null && !forceRefresh) {
       return this.championnatsCache;
     }
-    const q = query(this.ref, where('userId', '==', userId), orderBy('nom'));
-    const snap = await getDocs(q);
-    const championnats = snap.docs.map(d => ({ id: d.id, ...d.data() } as Championnat));
-    this.championnatsCache = championnats;
-    this.championnatsSubject.next(championnats);
-    return championnats;
+    try {
+      const q = query(this.ref, where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const map = new Map<string, Championnat>();
+      snap.docs.forEach(d => {
+        map.set(d.id, { id: d.id, ...d.data() } as Championnat);
+      });
+      const championnats = Array.from(map.values());
+      championnats.sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
+      this.championnatsCache = championnats;
+      this.championnatsSubject.next(championnats);
+      return championnats;
+    } catch (e) {
+      console.warn('Erreur getDocs championnats:', e);
+      return this.championnatsCache || [];
+    }
   }
 
   async getParId(id: string): Promise<Championnat | null> {
@@ -74,8 +91,8 @@ export class ChampionnatsService {
     const docRef = await addDoc(this.ref, championnatAvecUserId);
     const nouveau = { ...championnatAvecUserId, id: docRef.id };
     
-    // On utilise || [] pour éviter l'erreur si le cache est null
-    this.championnatsCache = [...(this.championnatsCache || []), nouveau].sort((a, b) => a.nom.localeCompare(b.nom));
+    const sansNouveau = (this.championnatsCache || []).filter(c => c.id !== docRef.id);
+    this.championnatsCache = [...sansNouveau, nouveau].sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
     this.championnatsSubject.next(this.championnatsCache);
     
     return docRef.id;

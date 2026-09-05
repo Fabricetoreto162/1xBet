@@ -21,6 +21,8 @@ export class ParisService {
   private parisSubject = new BehaviorSubject<Pari[]>([]);
   public paris$: Observable<Pari[]> = this.parisSubject.asObservable();
   private ecouteActive = false;
+  private unsubscribeListener?: () => void;
+  private dernierUserIdEcoute: string | null = null;
 
   constructor(
     private soldeSvc: SoldeService,
@@ -31,19 +33,31 @@ export class ParisService {
   }
 
   ecouterParis(): Observable<Pari[]> {
+    this.initEcoute();
     return this.paris$;
   }
 
-  private initEcoute(): void {
-    if (this.ecouteActive) return;
+  initEcoute(force = false): void {
     const userId = this.profilSvc.currentUserId;
     if (!userId) return;
+    if (this.ecouteActive && this.dernierUserIdEcoute === userId && !force) return;
+
+    if (this.unsubscribeListener) {
+      this.unsubscribeListener();
+      this.unsubscribeListener = undefined;
+    }
 
     this.ecouteActive = true;
+    this.dernierUserIdEcoute = userId;
     try {
-      const q = query(this.ref, where('userId', '==', userId), orderBy('dateCreation', 'desc'));
-      onSnapshot(q, (snap) => {
-        const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Pari));
+      const q = query(this.ref, where('userId', '==', userId));
+      this.unsubscribeListener = onSnapshot(q, (snap) => {
+        const map = new Map<string, Pari>();
+        snap.docs.forEach(d => {
+          map.set(d.id, { id: d.id, ...d.data() } as Pari);
+        });
+        const list = Array.from(map.values());
+        list.sort((a, b) => (b.dateCreation || '').localeCompare(a.dateCreation || ''));
         this.parisCache = list;
         this.parisSubject.next(list);
       }, (err) => console.warn('Erreur écoute paris', err));
@@ -56,15 +70,41 @@ export class ParisService {
     const userId = this.profilSvc.currentUserId;
     if (!userId) return [];
 
+    this.initEcoute();
+
     if (this.parisCache !== null && !forceRefresh) {
       return this.parisCache;
     }
-    const q = query(this.ref, where('userId', '==', userId), orderBy('dateCreation', 'desc'));
-    const snap = await getDocs(q);
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Pari));
-    this.parisCache = list;
-    this.parisSubject.next(list);
-    return list;
+    try {
+      const q = query(this.ref, where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const map = new Map<string, Pari>();
+      snap.docs.forEach(d => {
+        map.set(d.id, { id: d.id, ...d.data() } as Pari);
+      });
+      let list = Array.from(map.values());
+
+      if (list.length === 0) {
+        try {
+          const allSnap = await getDocs(this.ref);
+          allSnap.docs.forEach(d => {
+            const data = d.data() as any;
+            if (!data.userId || data.userId === userId) {
+              map.set(d.id, { id: d.id, ...data } as Pari);
+            }
+          });
+          list = Array.from(map.values());
+        } catch (_) {}
+      }
+
+      list.sort((a, b) => (b.dateCreation || '').localeCompare(a.dateCreation || ''));
+      this.parisCache = list;
+      this.parisSubject.next(list);
+      return list;
+    } catch (e) {
+      console.warn('Erreur getDocs paris:', e);
+      return this.parisCache || [];
+    }
   }
 
   async getParId(id: string): Promise<Pari | null> {
@@ -118,6 +158,10 @@ export class ParisService {
 
     const docRef = await addDoc(this.ref, nouveauPari);
     const pariCree: Pari = { id: docRef.id, ...nouveauPari };
+
+    const sansNouveau = (this.parisCache || []).filter(p => p.id !== docRef.id);
+    this.parisCache = [pariCree, ...sansNouveau].sort((a, b) => (b.dateCreation || '').localeCompare(a.dateCreation || ''));
+    this.parisSubject.next(this.parisCache);
 
     await this.soldeSvc.debiter(mise);
 

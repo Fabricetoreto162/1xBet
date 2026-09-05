@@ -36,6 +36,9 @@
     >
       <div class="coupon-fab">
         <ion-icon name="ticket"></ion-icon>
+        @if (badgeSvc.visible() && badgeSvc.count() > 0) {
+          <span class="badge-coupon">{{ badgeSvc.count() }}</span>
+        }
       </div>
       <span>Coupon</span>
     </div>

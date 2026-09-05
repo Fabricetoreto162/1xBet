@@ -15,6 +15,126 @@
 
 /* Global application styles */
 
+/* ==========================================================================
+   TYPOGRAPHIE GLOBALE (Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif)
+   ========================================================================== */
+
+* {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html,
+body,
+ion-app,
+ion-page,
+ion-content,
+button,
+input,
+textarea,
+select {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   1. EN-TÊTES : Medium (~500)
+   ========================================================================== */
+ion-header,
+ion-toolbar,
+ion-title,
+.header,
+.custom-header,
+.favoris-header,
+.menu-header,
+.detail-header,
+.event-top-bar,
+.coupon-header,
+.entete,
+.section-title-row,
+.header-titles,
+.header-content,
+.top-bar,
+.banner-header,
+thead,
+th {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-weight: 500;
+}
+
+/* Éléments texte et badges dans les en-têtes */
+.custom-header span,
+.favoris-header span,
+.menu-header span,
+.header-left span,
+.badge-favoris,
+.sub-counter {
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   2. TITRES : Semi-Bold / Bold (~600-700)
+   ========================================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-title,
+.modal-title,
+.card-title,
+.card-headline,
+.title,
+.titre,
+.player-name,
+.team-name,
+.section-title,
+.ticket-title,
+ion-card-title {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* Titres prioritaires même à l'intérieur d'un en-tête */
+ion-header h1,
+ion-header h2,
+ion-toolbar h1,
+ion-toolbar h2,
+.custom-header h1,
+.custom-header h2,
+.favoris-header h1,
+.favoris-header h2,
+.header-titles h1,
+.header-titles h2,
+.header-titles h3 {
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   3. SOUS-TITRES : Regular / Normal (~400)
+   ========================================================================== */
+p,
+.subtitle,
+.sub-title,
+.sub-text,
+.sous-titre,
+.card-description,
+.card-subtext,
+.player-id,
+.detail-desc,
+.description,
+.tile-sub,
+.empty-desc,
+.market-label,
+.info-text,
+.text-secondary,
+ion-card-subtitle,
+span.sub {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-weight: 400 !important;
+}
+
 ion-content {
   --background: var(--app-bg-shell);
 }

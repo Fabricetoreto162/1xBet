@@ -4,27 +4,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%; /* Centre verticalement sur l'écran */
+  height: 100%;
   width: 100%;
 }
 
 ion-spinner {
-  --color: #4184C8; /* La couleur bleue que tu as choisie */
-  width: 45px;      /* Taille normale, ni trop petite ni trop grande */
+  --color: #4184c8;
+  width: 45px;
   height: 45px;
 }
-
-
-
-
-
 
 // ── Header fixe (ne scroll pas) ──
 .entete-header {
   ion-toolbar {
-    --background: var(--app-background, #fff);
+    --background: #ffffff;
     --border-width: 0;
-    padding: 0 16px;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(16, 42, 69, 0.05);
   }
 }
 
@@ -42,187 +38,461 @@ ion-spinner {
     justify-content: center;
     width: 36px;
     height: 36px;
+    cursor: pointer;
 
-    ion-icon { font-size: 22px; color: var(--app-text-secondary); }
+    ion-icon {
+      font-size: 23px;
+      color: #3d6b96;
+    }
   }
 
   h1 {
-    font-size: 17px;
+    font-size: 17.5px;
     font-weight: 800;
-    color: var(--app-text-secondary);
+    color: #3d6b96;
     margin: 0;
+    letter-spacing: -0.2px;
   }
 }
 
 // ── Contenu scrollable ──
+ion-content {
+  --background: #ebf1f6;
+}
+
 .details-page {
-  padding: 8px 16px 24px; /* Un peu d'espace en haut, sur les côtés, et en bas */
+  background: #ebf1f6;
+  min-height: 100%;
+  padding: 8px 14px 28px;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.carte-resume,
-.carte-evenement {
-  background: var(--app-surface);
-  border-radius: 10px;
-  padding: 25px;
-  margin-bottom: 2px; /* Espace entre les cartes */
-  box-shadow: var(--app-surface-shadow);
+// ── Carte ticket de pari globale ──
+.ticket-carte {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(16, 42, 69, 0.06);
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+
+  .section-ticket {
+    background: #ffffff;
+    padding: 14px 18px;
+
+    &:first-child {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      padding-top: 16px;
+      padding-bottom: 12px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      padding-bottom: 16px;
+    }
+  }
 }
 
-.numero-coupon {
+// ── Séparateur de ticket (tirets pointillés + encoches demi-cercle) ──
+.separateur-ticket {
+  position: relative;
+  height: 20px;
+  background: #ffffff;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  background: var(--app-surface);
-  border-radius: 10px;
-  padding: 16px;
-  padding-bottom: 25px !important;
-  margin-bottom: 2px;
-  box-shadow: var(--app-surface-shadow);
+  align-items: center;
+  margin: 0;
+  width: 100%;
 
-  .date-mise {
-    font-size: 11.5px;
-    color: var(--app-text-secondary);
+  /* Encoche gauche : demi-cercle qui découpe le bord gauche */
+  &::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ebf1f6;
+    z-index: 2;
+    box-shadow: inset -1px 0 2px rgba(16, 42, 69, 0.08);
   }
 
-  strong {
-    font-size: 12.5px;
-    letter-spacing: 0.3px;
-    color: var(--app-text);
-    font-weight: 700;
+  /* Encoche droite : demi-cercle qui découpe le bord droit */
+  &::after {
+    content: '';
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ebf1f6;
+    z-index: 2;
+    box-shadow: inset 1px 0 2px rgba(16, 42, 69, 0.08);
+  }
+
+  /* Ligne en pointillés fins reliant les deux encoches */
+  .ligne-tiret {
+    width: 100%;
+    height: 0;
+    border-top: 1.5px dashed #cfd9e5;
+    margin: 0 14px;
   }
 }
 
+// ── Section 1 : En-tête du coupon (Date, Badge, Combiné №) ──
+.section-entete {
+  .ligne-date-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .date-ticket {
+      font-size: 13px;
+      font-weight: 500;
+      color: #74879b;
+      letter-spacing: -0.1px;
+    }
+
+    .badge-direct {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #eb3e3e;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 1px 7px 2px;
+      line-height: 1.2;
+
+      .point-badge {
+        font-size: 7px;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .ligne-titre-combine {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+
+    .type-combine {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0e263e;
+      letter-spacing: -0.2px;
+    }
+
+    .numero-combine {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a3554;
+      letter-spacing: 0.2px;
+    }
+  }
+}
+
+// ── Section 2 : Résumé financier et statut ──
+.section-resume {
+  padding-top: 12px;
+  padding-bottom: 14px;
+
+  .ligne-nb-evenements {
+    margin-bottom: 8px;
+
+    .avec-icone {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #0e263e;
+
+      .icone-combine {
+        width: 17px;
+        height: 17px;
+        object-fit: contain;
+      }
+    }
+
+    .termines {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0e263e;
+    }
+  }
+}
+
+// ── Ligne de détail générique (clé/valeur) ──
 .ligne-detail {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  color: var(--app-text-secondary);
-  padding: 5px 0;
+  padding: 4.5px 0;
+  font-size: 13.5px;
 
-  strong { color: var(--app-text); font-weight: 700; }
-
-  .avec-icone {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 700;
-    color: var(--app-text);
-
-    .icone-combine {
-      width: 16px;
-      height: 16px;
-      object-fit: contain;
-    }
+  .libelle {
+    color: #5b7289;
+    font-weight: 500;
   }
 
-  .termines { font-size: 12px; color: var(--app-text-secondary); }
+  .valeur {
+    color: #0e263e;
+    font-weight: 800;
+    font-size: 14.5px;
+    letter-spacing: 0.2px;
+  }
+
+  .valeur-gains {
+    color: #1fa855;
+    font-weight: 800;
+    font-size: 15.5px;
+    letter-spacing: 0.2px;
+  }
+
+  .libelle-prono {
+    color: #0e263e;
+    font-weight: 700;
+    font-size: 13.5px;
+  }
+
+  .cote-prono {
+    color: #0e263e;
+    font-weight: 800;
+    font-size: 14.5px;
+  }
 }
 
+// ── Pastille et libellé de statut ──
 .statut {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12.5px;
+  gap: 5px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--app-primary); /* Couleur par défaut */
   white-space: nowrap;
 
-  ion-icon { font-size: 16px; border-radius: 50%; }
-
-  /* Accepté / En attente */
-  &.accepte, &.en-attente {
-    color: var(--app-primary);
-    ion-icon { color: var(--app-primary); }
+  ion-icon {
+    font-size: 17px;
   }
 
-  /* Gagné / Payé */
-  &.gagne, &.paye {
-    color: var(--app-success);
-    ion-icon { color: var(--app-success); }
+  &.paye,
+  &.gagne {
+    color: #1fa855;
+    ion-icon {
+      color: #1fa855;
+    }
   }
 
-  /* Perdu */
   &.perdu {
-    color: var(--app-danger);
-    ion-icon { color: var(--app-danger); }
+    color: #e5484d;
+    ion-icon {
+      color: #e5484d;
+    }
+  }
+
+  &.accepte,
+  &.en-attente {
+    color: #4184c8;
+    ion-icon {
+      color: #4184c8;
+    }
   }
 }
 
-.ligne-sport {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--app-text);
-  margin-bottom: 2px; /* Rapproche un peu la date */
+// ── Section 3 : Événement sportif ──
+.section-evenement {
+  padding-top: 12px;
+  padding-bottom: 14px;
 
-  .icone-sport {
-    width: 18px;
-    height: 18px;
-    margin-top: 10px;
-    object-fit: contain;
+  .ligne-sport {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+
+    .icone-sport {
+      width: 17px;
+      height: 17px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .nom-sport {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #41576d;
+      letter-spacing: -0.1px;
+    }
+  }
+
+  .ligne-date-ev {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-left: 24px;
+
+    .date-ev {
+      font-size: 12px;
+      font-weight: 500;
+      color: #74879b;
+    }
+
+    .badge-direct {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #eb3e3e;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 1px 6px;
+      line-height: 1.2;
+
+      .point-badge {
+        font-size: 7px;
+        color: #ffffff;
+      }
+    }
   }
 }
 
-.ligne-date {
+// ── Bloc des équipes et des scores ──
+.bloc-equipes {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  width: 100%;
   margin-bottom: 12px;
-
-  .date { 
-    font-size: 11.5px; 
-    color: var(--app-text-secondary);
-    padding-left: 22px; /* Décale la date pour qu'elle commence sous le texte, pas sous l'icône */
-  }
 }
+
 .ligne-equipes {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  width: 100%;
+  gap: 8px;
 
   .equipe {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
-    flex: 0 0 auto;
+    gap: 8px;
+    flex: 1 1 0;
+    min-width: 0;
 
-    img { width: 35px; height: 35px; object-fit: contain; }
-    span { font-size: 12px; font-weight: 700; color: var(--app-text); text-align: center; }
+    &.equipe1 {
+      justify-content: flex-end;
+
+      .nom-equipe {
+        text-align: right;
+      }
+    }
+
+    &.equipe2 {
+      justify-content: flex-start;
+
+      .nom-equipe {
+        text-align: left;
+      }
+    }
+
+    .logo-equipe {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .nom-equipe {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0e263e;
+      line-height: 1.25;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
   }
 
-  .score {
-    font-size: 16px;
+  .score-principal {
+    flex: 0 0 auto;
+    font-size: 21px;
     font-weight: 800;
-    color: var(--app-text);
-    padding: 0 12px;
+    color: #0e263e;
+    padding: 0 6px;
+    letter-spacing: 1px;
+    text-align: center;
+    white-space: nowrap;
 
-    &.en-attente { 
-      color: var(--app-text-secondary); 
+    &.en-attente {
+      color: #74879b;
       font-weight: 700;
       font-size: 18px;
+      letter-spacing: 0.5px;
     }
   }
 }
 
+.score-detail-mitemps {
+  font-size: 12px;
+  font-weight: 500;
+  color: #74879b;
+  text-align: center;
+  margin-top: 3px;
+  letter-spacing: 0.2px;
+}
+
+// ── Ligne de direct (temps écoulé) ──
+.ligne-live {
+  padding: 3px 0;
+
+  .label-live {
+    font-size: 12px;
+    font-weight: 700;
+    color: #74879b;
+    letter-spacing: 0.3px;
+  }
+
+  .temps-live {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #0e263e;
+  }
+}
+
+// ── Bouton d'action du coupon ──
 .btn-dupliquer {
   display: block;
   width: 100%;
   border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-top: 8px;
-  background: var(--app-primary-light, #b0d7f7);
-  color: var(--app-primary);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 14px;
+  background: #a9d4f5;
+  color: #065697;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
   text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:active {
+    background: #90c5f0;
+  }
 }
 
 // ── Cacher la scrollbar tout en gardant le scroll natif d'Ionic ──

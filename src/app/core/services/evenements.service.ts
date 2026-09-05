@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { 
-  collection, getDocs, addDoc, orderBy, query, 
-  doc, getDoc, updateDoc, deleteDoc, onSnapshot, where 
+  collection, getDocs, addDoc, query, 
+  doc, getDoc, updateDoc, deleteDoc, onSnapshot, where, Unsubscribe 
 } from 'firebase/firestore';
 import { db } from '../../data/firebase/firebase-client';
 import { Evenement } from '../models/evenement.model';
@@ -15,28 +15,39 @@ export class EvenementsService {
   private evenementsSubject = new BehaviorSubject<Evenement[]>([]);
   public evenements$: Observable<Evenement[]> = this.evenementsSubject.asObservable();
   private ecouteActive = false;
+  private unsubscribeListener?: Unsubscribe;
 
   constructor(private profilSvc: ProfilService) {
     this.initEcoute();
   }
 
   ecouterEvenements(): Observable<Evenement[]> {
+    this.initEcoute();
     return this.evenements$;
   }
 
   private initEcoute(): void {
-    if (this.ecouteActive) return;
     const userId = this.profilSvc.currentUserId;
     if (!userId) return;
+    if (this.ecouteActive) return;
 
     this.ecouteActive = true;
     try {
-      const q = query(this.ref, where('userId', '==', userId), orderBy('dateHeure'));
-      onSnapshot(q, (snap) => {
-        const events = snap.docs.map(d => ({ id: d.id, ...d.data() } as Evenement));
+      // NOTE : on ne combine PAS where('userId') avec orderBy('dateHeure') dans Firestore
+      // car cela nécessite un index composite manuel. On filtre par userId et on trie en JS.
+      const q = query(this.ref, where('userId', '==', userId));
+      this.unsubscribeListener = onSnapshot(q, (snap) => {
+        const map = new Map<string, Evenement>();
+        snap.docs.forEach(d => {
+          map.set(d.id, { id: d.id, ...d.data() } as Evenement);
+        });
+        const events = Array.from(map.values());
+        events.sort((a, b) => (a.dateHeure || '').localeCompare(b.dateHeure || ''));
         this.evenementsCache = events;
         this.evenementsSubject.next(events);
-      }, (err) => console.warn('Erreur écoute evenements', err));
+      }, (err) => {
+        console.warn('Erreur écoute evenements:', err);
+      });
     } catch (e) {
       console.warn('Erreur init écoute evenements', e);
     }
@@ -46,15 +57,28 @@ export class EvenementsService {
     const userId = this.profilSvc.currentUserId;
     if (!userId) return [];
 
+    this.initEcoute();
+
     if (this.evenementsCache !== null && !forceRefresh) {
       return this.evenementsCache;
     }
-    const q = query(this.ref, where('userId', '==', userId), orderBy('dateHeure'));
-    const snap = await getDocs(q);
-    const events = snap.docs.map(d => ({ id: d.id, ...d.data() } as Evenement));
-    this.evenementsCache = events;
-    this.evenementsSubject.next(events);
-    return events;
+
+    try {
+      const q = query(this.ref, where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const map = new Map<string, Evenement>();
+      snap.docs.forEach(d => {
+        map.set(d.id, { id: d.id, ...d.data() } as Evenement);
+      });
+      const events = Array.from(map.values());
+      events.sort((a, b) => (a.dateHeure || '').localeCompare(b.dateHeure || ''));
+      this.evenementsCache = events;
+      this.evenementsSubject.next(events);
+      return events;
+    } catch (e) {
+      console.warn('Erreur getDocs evenements:', e);
+      return this.evenementsCache || [];
+    }
   }
 
   async getParId(id: string): Promise<Evenement | null> {
@@ -70,22 +94,47 @@ export class EvenementsService {
   }
 
   async ajouter(evenement: Omit<Evenement, 'id' | 'scoreFinal' | 'statutEvenement'>): Promise<string> {
+    const userId = this.profilSvc.currentUserId;
     const nouveauSansId = {
       ...evenement,
-      userId: this.profilSvc.currentUserId, // <-- Lien avec l'utilisateur
+      userId: userId || undefined,
       scoreFinal: null,
       statutEvenement: 'a_venir' as const
     };
     const docRef = await addDoc(this.ref, nouveauSansId);
+    const nouvelEvent: Evenement = { id: docRef.id, ...nouveauSansId };
+
+    const cacheSansNouveau = (this.evenementsCache || []).filter(e => e.id !== docRef.id);
+    const listeActuelle = [nouvelEvent, ...cacheSansNouveau];
+    listeActuelle.sort((a, b) => (a.dateHeure || '').localeCompare(b.dateHeure || ''));
+    this.evenementsCache = listeActuelle;
+    this.evenementsSubject.next(this.evenementsCache);
+
     return docRef.id;
   }
 
   async modifier(id: string, modifications: Partial<Evenement>): Promise<void> {
-    const ref = doc(db, 'evenements', id);
-    await updateDoc(ref, modifications);
+    const refDoc = doc(db, 'evenements', id);
+    await updateDoc(refDoc, modifications);
+
+    if (this.evenementsCache) {
+      this.evenementsCache = this.evenementsCache.map(e => {
+        if (e.id === id) {
+          return { ...e, ...modifications };
+        }
+        return e;
+      });
+      this.evenementsCache.sort((a, b) => (a.dateHeure || '').localeCompare(b.dateHeure || ''));
+      this.evenementsSubject.next(this.evenementsCache);
+    }
   }
 
   async supprimer(id: string): Promise<void> {
     await deleteDoc(doc(db, 'evenements', id));
+
+    if (this.evenementsCache) {
+      this.evenementsCache = this.evenementsCache.filter(e => e.id !== id);
+      this.evenementsSubject.next(this.evenementsCache);
+    }
   }
 }

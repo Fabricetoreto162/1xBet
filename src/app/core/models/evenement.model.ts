@@ -9,5 +9,12 @@ export interface Evenement {
   sens: 'plus' | 'moins';
   cote: number;
   scoreFinal: { a: number; b: number } | null;
+  scoreMiTemps?: {
+    mt1: { a: number; b: number };
+    mt2: { a: number; b: number };
+  } | null;
+  detailMiTemps?: string | null;
   statutEvenement: 'a_venir' | 'termine';
+  enDirect?: boolean;
+  tempsEcoule?: string;
 }

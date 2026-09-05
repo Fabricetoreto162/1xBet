@@ -146,7 +146,7 @@ export class DetailsPariPage implements OnInit {
   }
 
   libelleGains(): string {
-    return this.pari?.statut === 'accepte' ? 'Gains potentiels :' : 'Gains :';
+    return this.pari?.statut === 'accepte' ? 'Gains potentiels :' : 'Gains';
   }
 
   libellePronostic(j: JambePari): string {
@@ -189,6 +189,34 @@ export class DetailsPariPage implements OnInit {
 
 
   onErreurLogo(event: Event) {
-  (event.target as HTMLImageElement).src = 'assets/icons/logo-defaut.png';
-}
+    (event.target as HTMLImageElement).src = 'assets/icons/logo-defaut.png';
+  }
+
+  getDetailMiTemps(sf: { a: number; b: number } | null | undefined, ev?: Evenement | null): string {
+    if (!sf) return '';
+
+    if (ev?.detailMiTemps) {
+      return ev.detailMiTemps;
+    }
+    if (ev?.scoreMiTemps) {
+      return `${ev.scoreMiTemps.mt1.a}:${ev.scoreMiTemps.mt1.b},${ev.scoreMiTemps.mt2.a}:${ev.scoreMiTemps.mt2.b}`;
+    }
+
+    let seed = 17;
+    const eventId = ev?.id;
+    if (eventId) {
+      for (let i = 0; i < eventId.length; i++) {
+        seed = (seed * 37 + eventId.charCodeAt(i)) % 10007;
+      }
+    }
+
+    // Répartition cohérente avec sf.a et sf.b
+    const a1 = sf.a > 0 ? (seed % (sf.a + 1)) : 0;
+    const a2 = sf.a - a1;
+
+    const b1 = sf.b > 0 ? (Math.floor(seed / 3) % (sf.b + 1)) : 0;
+    const b2 = sf.b - b1;
+
+    return `${a1}:${b1},${a2}:${b2}`;
+  }
 }

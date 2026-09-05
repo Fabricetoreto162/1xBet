@@ -32,7 +32,9 @@ import { Club } from '../../core/models/club.model';
 export class ScoresPage implements OnInit {
   evenements: Evenement[] = [];
   clubsMap: Record<string, Club> = {};
-  scores: Record<string, string> = {}; // Stocke les scores saisis (ex: "2-1")
+  scores: Record<string, string> = {}; // Stocke les scores finaux (ex: "2-1")
+  scoresMT1: Record<string, string> = {}; // Score 1ère mi-temps (ex: "2-0")
+  scoresMT2: Record<string, string> = {}; // Score 2ème mi-temps (ex: "0-1")
 
   constructor(
     private evenementsSvc: EvenementsService,
@@ -89,18 +91,68 @@ export class ScoresPage implements OnInit {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
 
-  appliquerScore(eventId: string, score: string) {
-    this.scores[eventId] = score;
+  parserScore(val: string | undefined | null): { a: number; b: number } | null {
+    if (!val) return null;
+    const cleaned = val.trim().replace(':', '-').replace(/\s+/g, '-');
+    const parts = cleaned.split('-');
+    if (parts.length !== 2) return null;
+    const a = parseInt(parts[0].trim(), 10);
+    const b = parseInt(parts[1].trim(), 10);
+    if (isNaN(a) || isNaN(b) || a < 0 || b < 0) return null;
+    return { a, b };
+  }
+
+  surChangementMiTemps(eventId: string) {
+    const mt1 = this.parserScore(this.scoresMT1[eventId]);
+    const mt2 = this.parserScore(this.scoresMT2[eventId]);
+
+    if (mt1 && mt2) {
+      const a = mt1.a + mt2.a;
+      const b = mt1.b + mt2.b;
+      this.scores[eventId] = `${a}-${b}`;
+    } else if (mt1 && !this.scoresMT2[eventId]) {
+      this.scores[eventId] = `${mt1.a}-${mt1.b}`;
+    }
     this.cdr.detectChanges();
   }
 
+  surChangementScoreFinal(eventId: string) {
+    this.cdr.detectChanges();
+  }
+
+  appliquerScore(eventId: string, score: string) {
+    this.scores[eventId] = score;
+    const parsed = this.parserScore(score);
+    if (parsed) {
+      const a1 = Math.ceil(parsed.a / 2);
+      const a2 = parsed.a - a1;
+      const b1 = Math.floor(parsed.b / 2);
+      const b2 = parsed.b - b1;
+      this.scoresMT1[eventId] = `${a1}-${b1}`;
+      this.scoresMT2[eventId] = `${a2}-${b2}`;
+    }
+    this.cdr.detectChanges();
+  }
+
+  getApercuScore(eventId: string): string | null {
+    const sf = this.parserScore(this.scores[eventId]);
+    if (!sf) return null;
+    const mt1 = this.parserScore(this.scoresMT1[eventId]);
+    const mt2 = this.parserScore(this.scoresMT2[eventId]);
+
+    if (mt1 && mt2) {
+      return `${sf.a}:${sf.b} (${mt1.a}:${mt1.b},${mt2.a}:${mt2.b})`;
+    }
+    return `${sf.a}:${sf.b}`;
+  }
+
   async enregistrerScore(ev: Evenement) {
-    const scoreStr = this.scores[ev.id!];
+    const sf = this.parserScore(this.scores[ev.id!]);
     
     // Vérification du format (ex: "2-1")
-    if (!scoreStr || !scoreStr.includes('-')) {
+    if (!sf) {
       const toast = await this.toastCtrl.create({
-        message: 'Format du score invalide. Utilisez le format 2-1.',
+        message: 'Format du score final invalide. Utilisez par exemple 2-1.',
         duration: 2000,
         color: 'danger'
       });
@@ -108,37 +160,47 @@ export class ScoresPage implements OnInit {
       return;
     }
 
-    const parts = scoreStr.split('-');
-    const a = parseInt(parts[0].trim(), 10);
-    const b = parseInt(parts[1].trim(), 10);
+    const mt1 = this.parserScore(this.scoresMT1[ev.id!]);
+    const mt2 = this.parserScore(this.scoresMT2[ev.id!]);
 
-    if (isNaN(a) || isNaN(b)) {
-      const toast = await this.toastCtrl.create({
-        message: 'Veuillez entrer des chiffres valides.',
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
-      return;
+    let scoreMiTemps: { mt1: { a: number; b: number }; mt2: { a: number; b: number } } | null = null;
+    let detailMiTemps: string | null = null;
+
+    if (mt1 && mt2) {
+      scoreMiTemps = { mt1, mt2 };
+      detailMiTemps = `${mt1.a}:${mt1.b},${mt2.a}:${mt2.b}`;
+    } else {
+      const a1 = Math.ceil(sf.a / 2);
+      const a2 = sf.a - a1;
+      const b1 = Math.floor(sf.b / 2);
+      const b2 = sf.b - b1;
+      scoreMiTemps = {
+        mt1: { a: a1, b: b1 },
+        mt2: { a: a2, b: b2 }
+      };
+      detailMiTemps = `${a1}:${b1},${a2}:${b2}`;
     }
 
     const loading = await this.loadingCtrl.create({ message: 'Enregistrement...', spinner: 'crescent' });
     await loading.present();
 
     try {
-      // 1. On met à jour l'événement avec le score (objet { a, b }) et on change le statut
-      await this.evenementsSvc.modifier(ev.id!, { 
-        scoreFinal: { a, b }, 
+      // 1. On met à jour l'événement avec le score final, le score par mi-temps et on passe en terminé
+      const modifications: Partial<Evenement> = { 
+        scoreFinal: { a: sf.a, b: sf.b },
+        scoreMiTemps,
+        detailMiTemps,
         statutEvenement: 'termine' 
-      });
+      };
+
+      await this.evenementsSvc.modifier(ev.id!, modifications);
       
-      // 2. On récupère tous les événements pour avoir une Map à jour pour l'évaluation
+      // 2. On récupère tous les événements pour avoir une Map à jour pour l'évaluation des paris
       const tousEvenements = await this.evenementsSvc.listerTous();
       const eventsMap = new Map<string, Evenement>();
       tousEvenements.forEach(e => {
-        // On s'assure que l'événement modifié a bien son score dans la Map
         if (e.id === ev.id) {
-          eventsMap.set(e.id!, { ...e, scoreFinal: { a, b }, statutEvenement: 'termine' });
+          eventsMap.set(e.id!, { ...e, ...modifications });
         } else {
           eventsMap.set(e.id!, e);
         }
@@ -150,8 +212,21 @@ export class ScoresPage implements OnInit {
       // 4. On retire l'événement de la liste affichée à l'écran
       this.evenements = this.evenements.filter(e => e.id !== ev.id);
       
+      const toast = await this.toastCtrl.create({
+        message: `Score enregistré : ${sf.a}:${sf.b} (${detailMiTemps})`,
+        duration: 2500,
+        color: 'success'
+      });
+      await toast.present();
+
     } catch (e) {
-      console.error("Erreur", e);
+      console.error("Erreur enregistrement score", e);
+      const toast = await this.toastCtrl.create({
+        message: "Erreur lors de l'enregistrement du score.",
+        duration: 2500,
+        color: 'danger'
+      });
+      await toast.present();
     } finally {
       await loading.dismiss();
       this.cdr.detectChanges();
